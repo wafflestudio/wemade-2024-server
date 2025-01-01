@@ -23,10 +23,10 @@ CSRF_TRUSTED_ORIGINS= ['https://*.azurewebsites.net']
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-!6v%q59-l*6j2ppf9cnl608m#4$$9)c@i(yk%2v1*tg4wy=ek^"
+SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get("DEBUG")
 
 ALLOWED_HOSTS = [
     'wemade-2024-server-h0csbcbdesdbe0ep.eastasia-01.azurewebsites.net',
