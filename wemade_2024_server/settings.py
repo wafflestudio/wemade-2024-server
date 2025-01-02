@@ -30,7 +30,8 @@ DEBUG = os.environ.get("DEBUG")
 
 ALLOWED_HOSTS = [
     'wemade-2024-server-h0csbcbdesdbe0ep.eastasia-01.azurewebsites.net',
-    'http://localhost:8000',
+    'localhost',
+    '127.0.0.1'
 ]
 
 
@@ -87,6 +88,14 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": BASE_DIR / "db.sqlite3",
+    },
+    "local": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "wemade_2024",
+        "USER": "root",
+        "PASSWORD": "password",
+        "HOST": "localhost",
+        "PORT": "5432",
     }
 }
 
