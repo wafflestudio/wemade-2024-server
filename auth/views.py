@@ -11,15 +11,17 @@ from urllib.parse import urljoin
 from django.conf import settings
 from django.shortcuts import render
 from django.views import View
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
 
 class GoogleLogin(SocialLoginView):
+    permission_classes = [AllowAny]
     adapter_class = GoogleOAuth2Adapter
     callback_url = settings.GOOGLE_OAUTH_CALLBACK_URL
     client_class = OAuth2Client
 
 class GoogleLoginCallback(APIView):
+    permission_classes = [AllowAny]
     def get(self, request, *args, **kwargs):
         code = request.GET.get("code")
 
@@ -44,6 +46,7 @@ class GoogleLoginCallback(APIView):
         return Response(response.json(), status=status.HTTP_200_OK)
 
 class LoginPage(View):
+    permission_classes = [AllowAny]
     def get(self, request, *args, **kwargs):
         return render(
             request,
@@ -55,7 +58,5 @@ class LoginPage(View):
         )
 
 class ProtectedView(APIView):
-    permission_classes = [IsAuthenticated]
-
     def get(self, request):
         return Response({"message": f"Hello, {request.user.email}!"})
