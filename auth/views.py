@@ -58,4 +58,4 @@ class ProtectedView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        return Response({"message": f"Hello, {request.user.first_name}!"})
+        return Response({"message": f"Hello, {request.user.email}!"})
