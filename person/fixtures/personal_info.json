@@ -1,0 +1,10 @@
+[
+  {
+    "model": "person.PersonalInfo",
+    "pk": 1,
+    "fields": {
+      "email": "dlacksdud2@gmail.com",
+      "name": "chanyeong lim"
+    }
+  }
+]

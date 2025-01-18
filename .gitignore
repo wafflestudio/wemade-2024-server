@@ -121,6 +121,7 @@ celerybeat.pid
 
 # Environments
 wemade_2024_server/.env
+.env
 .venv
 env/
 venv/

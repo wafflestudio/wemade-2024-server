@@ -16,8 +16,11 @@ Including another URLconf
 """
 
 from django.contrib import admin
-from django.urls import path
+from django.urls import include, path, re_path
+
+from oauth.views import GoogleLogin, GoogleLoginCallback, LoginPage, ProtectedView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("", include("oauth.urls")),
 ]
