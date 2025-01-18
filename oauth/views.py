@@ -64,7 +64,7 @@ class GoogleLoginCallback(APIView):
         email = userinfo.get("email")
         name = userinfo.get("name")
 
-        email_domains = ["wemade.com", "wemadeconnect.com", "gmail.com"]
+        email_domains = ["@wemade.com", "@wemadeconnect.com", "@gmail.com", "@snu.ac.kr"]
         if not email or not any(email.endswith(domain) for domain in email_domains):
             return Response({"error": "Email not provided by Corporation"}, status=status.HTTP_400_BAD_REQUEST)
 
