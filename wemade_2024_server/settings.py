@@ -103,7 +103,7 @@ WSGI_APPLICATION = "wemade_2024_server.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "wemade_2024",
+        "NAME": "wemade-2024-server-database",
         "USER": os.environ.get("DB_USER"),
         "PASSWORD": os.environ.get("DB_PASSWORD"),
         "HOST": os.environ.get("DB_HOST"),
