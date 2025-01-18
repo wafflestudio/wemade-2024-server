@@ -22,5 +22,6 @@ from oauth.views import GoogleLogin, GoogleLoginCallback, LoginPage, ProtectedVi
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("personCard/", include("personCard.urls")),
     path("", include("oauth.urls")),
 ]
