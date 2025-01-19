@@ -1,6 +1,8 @@
 from django.shortcuts import render
-from person.models import Person, PersonalInfo
 from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.response import Response
+
+from person.models import Person, PersonalInfo
 from .serializers import *
 from .paginations import *
 
@@ -74,7 +76,7 @@ class PersonCardListDetailAPI(RetrieveAPIView):
 
     def retrieve(self, request, *args, **kwargs):
         # Get p_id from the request data
-        p_id = request.data.get('p_id')
+        p_id = kwargs.get('p_id')
 
         if not p_id:
             return Response({"error": "p_id is required"}, status=400)
@@ -113,7 +115,7 @@ class PersonCardDetailAPI(RetrieveAPIView):
 
     def retrieve(self, request, *args, **kwargs):
         # Get p_id from the request data
-        p_id = request.data.get('p_id')
+        p_id = kwargs.get('p_id')
 
         if not p_id:
             return Response({"error": "p_id is required"}, status=400)
@@ -144,7 +146,7 @@ class PersonCardUpdateAPI(RetrieveUpdateDestroyAPIView):
 
     def get_object(self):
         # Get p_id from the request data
-        p_id = self.request.data.get('p_id')
+        p_id = kwargs.get('p_id')
 
         if not p_id:
             raise ValueError("p_id is required")

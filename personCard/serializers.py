@@ -16,11 +16,16 @@ class PersonCardListSerializer(serializers.ModelSerializer):
         account = Account.objects.filter(p_id=obj).first()
         return account.email if account else None
 
+
 class PersonCardListDetailSerializer(serializers.ModelSerializer):
     name = serializers.CharField()
     phone_number = serializers.CharField(required=False, allow_null=True)
     info = serializers.ListField(child=serializers.JSONField(), required=False, allow_null=True)
     emails = serializers.ListField(child=serializers.EmailField(), required=False, allow_null=True)
+
+    class Meta:
+        model = Person
+        fields = ['name', 'phone_number', 'info', 'emails']
 
 
 class PersonCardDetailSerializer(serializers.ModelSerializer):
@@ -28,6 +33,10 @@ class PersonCardDetailSerializer(serializers.ModelSerializer):
     phone_number = serializers.CharField(required=False, allow_null=True)
     info = serializers.JSONField(required=False, allow_null=True)
     emails = serializers.ListField(child=serializers.EmailField(), required=False, allow_null=True)
+
+    class Meta:
+        model = Person
+        fields = ['name', 'phone_number', 'info', 'emails']
 
 
 class PersonCardUpdateSerializer(serializers.ModelSerializer):

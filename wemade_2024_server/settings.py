@@ -11,8 +11,9 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
-import os
 from dotenv import load_dotenv
+from datetime import timedelta
+import os
 
 #load_dotenv(".env")
 
@@ -63,6 +64,8 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt",
     "oauth",
     "person",
+    "personCard",
+    'drf_yasg',
 ]
 
 MIDDLEWARE = [
@@ -214,8 +217,6 @@ REST_FRAMEWORK = {
     ),
 }
 
-from datetime import timedelta
-
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=180),  # 6 months
     "REFRESH_TOKEN_LIFETIME": timedelta(days=365),  # Optional, for token refresh
@@ -227,3 +228,5 @@ SIMPLE_JWT = {
     "USER_ID_FIELD": "id",
     "USER_ID_CLAIM": "user_id",
 }
+
+APPEND_SLASH = True
