@@ -1,16 +1,7 @@
 from django.db import models
 
-class PersonalInfo(models.Model):
-    p_id = models.ForeignKey('Person', on_delete=models.CASCADE)
-    p_info = models.JSONField(null=True, blank=True)  # JSON 데이터를 저장할 필드
-
-    class Meta:
-        db_table = 'personal_info'
-        app_label = 'person'
-
-
 class Person(models.Model):
-    p_id = models.IntegerField(null=False, unique=True)  # p_id를 고유값으로 설정
+    p_id = models.BigAutoField(primary_key=True) # p_id를 고유값으로 설정
     name = models.CharField(max_length=100)
 
     class Meta:
@@ -18,9 +9,22 @@ class Person(models.Model):
         app_label = 'person'
 
 
+class PersonalInfo(models.Model):
+    ## 가정: 생일 & 이름이 같은 사람은 없다
+    p_id = models.ForeignKey('Person', on_delete=models.CASCADE)
+    #phone_number = models.TextField(max_length=13)  # '010-0000-0000' 형태, 여러 개일 수 있음
+    birthday = models.TextField(max_length=10) #2000-01-01 형태
+    p_info = models.JSONField(null=True, blank=True)  # JSON 데이터를 저장할 필드
+
+    class Meta:
+        db_table = 'personal_info'
+        app_label = 'person'
+
+
 class Account(models.Model):
     email = models.EmailField()
     p_id = models.ForeignKey('Person', null=True, on_delete=models.SET_NULL)
+    name = models.ForeignKey('Person', null=True, on_delete=models.SET_NULL)
 
     class Meta:
         db_table = 'account'
