@@ -1,5 +1,5 @@
 from rest_framework.pagination import CursorPagination
-from person import Person, PersonInfo
+from person.models import Person, PersonalInfo
 
 
 class PersonCardListPagination(CursorPagination):

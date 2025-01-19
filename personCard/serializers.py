@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from person.models import Person, PersonInfo
+from person.models import Person, PersonalInfo
 
 
 class PersonCardListSerializer(serializers.ModelSerializer):

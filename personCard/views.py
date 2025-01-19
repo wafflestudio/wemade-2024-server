@@ -1,6 +1,8 @@
 from django.shortcuts import render
-from person import Person, PersonInfo
-from rest_framework.generics import ListCreateAPIView, RetrieveAPIView, RetrieveUpdateDestroyAPIView
+from person.models import Person, PersonalInfo
+from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveAPIView, RetrieveUpdateDestroyAPIView
+from .serializers import *
+from .paginations import *
 
 class PersonCardListAPI(ListCreateAPIView):
     serializer_class = PersonCardListSerializer
@@ -21,7 +23,7 @@ class PersonCardListAPI(ListCreateAPIView):
             {
                 "p_id": person.p_id,
                 "name": person.name,
-                "email": Account.objects.filter(p_id=person).values_list('email', flat=True).first()
+                "email": Account.objects.filter(p_id=person).values_list('email', flat=True).first(),
                 "corporation": "",
                 "team": "",
                 "role": "",
@@ -137,8 +139,8 @@ class PersonCardDetailAPI(RetrieveAPIView):
         return Response(response_data, status=200)
 
 
-class PersonCardUpdateDestroyAPI(RetrieveUpdateDestroyAPIView):
-    serializer_class = PersonCardUpdateDestroySerializer
+class PersonCardUpdateAPI(RetrieveUpdateDestroyAPIView):
+    serializer_class = PersonCardUpdateSerializer
 
     def get_object(self):
         # Get p_id from the request data
@@ -164,7 +166,7 @@ class PersonCardUpdateDestroyAPI(RetrieveUpdateDestroyAPIView):
         self.perform_update(serializer)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def destroy(self, request, *args, **kwargs):
-        instance = self.get_object()
-        self.perform_destroy(instance)
-        return Response(status=status.HTTP_204_NO_CONTENT)
+    # def destroy(self, request, *args, **kwargs):
+    #     instance = self.get_object()
+    #     self.perform_destroy(instance)
+    #     return Response(status=status.HTTP_204_NO_CONTENT)

@@ -23,8 +23,8 @@ class PersonalInfo(models.Model):
 
 class Account(models.Model):
     email = models.EmailField()
-    p_id = models.ForeignKey('Person', null=True, on_delete=models.SET_NULL)
-    name = models.ForeignKey('Person', null=True, on_delete=models.SET_NULL)
+    p_id = models.ForeignKey('Person', null=True, on_delete=models.SET_NULL, related_name='accounts_by_p_id')
+    name = models.ForeignKey('Person', null=True, on_delete=models.SET_NULL, related_name='accounts_by_name')
 
     class Meta:
         db_table = 'account'
