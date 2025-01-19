@@ -12,7 +12,7 @@ class Person(models.Model):
 class PersonalInfo(models.Model):
     ## 가정: 생일 & 이름이 같은 사람은 없다
     p_id = models.ForeignKey('Person', on_delete=models.CASCADE)
-    #phone_number = models.TextField(max_length=13)  # '010-0000-0000' 형태, 여러 개일 수 있음
+    main_phone_number = models.TextField(max_length=13)  # '010-0000-0000' 형태, 여러 개일 수 있음
     birthday = models.TextField(max_length=10) #2000-01-01 형태
     p_info = models.JSONField(null=True, blank=True)  # JSON 데이터를 저장할 필드
 

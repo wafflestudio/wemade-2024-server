@@ -32,16 +32,40 @@ class PersonCardListAPI(ListCreateAPIView):
         return self.get_paginated_response(data)
 
 
-# class  PersonCardSearchListAPIView(ListAPIView):
-#     serializer_class = PersonCardListSerializer
-#     pagination_class = PersonCardListPagination
-#
-#     def get_queryset(self):
-#         #corporation - team 구조 가정 (조직 밑에 조직 밑에 조직 구조 고려 필요)
-#         corporation = self.request.query_params.get('corporation')
-#         team = self.request.query_params.get('team')
-#
-#         return Person.objects.filter()
+class PersonCardSearchListAPIView(ListAPIView):
+    serializer_class = PersonCardListSerializer
+    pagination_class = PersonCardListPagination
+
+    # 현재 => 이름으로 검색. 추후 corporation/team/role 단위 검색 만들 예정
+    def get_queryset(self):
+        name = self.request.query_params.get('name')
+
+        if not name:
+            # name 파라미터가 없을 경우, 모든 Person 반환
+            return Person.objects.all()
+
+        # 이름이 부분 일치하는 Person 객체 반환
+        return Person.objects.filter(name__icontains=name)
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        page = self.paginate_queryset(queryset)
+
+        # Prepare data with names and associated email addresses
+        data = [
+            {
+                "p_id": person.p_id,
+                "name": person.name,
+                "email": Account.objects.filter(p_id=person).values_list('email', flat=True).first(),
+                "corporation": "",
+                "team": "",
+                "role": "",
+            }
+            for person in page
+        ]
+
+        return self.get_paginated_response(data)
+
 
 class PersonCardListDetailAPI(RetrieveAPIView):
     serializer_class = PersonCardListDetailSerializer
@@ -74,7 +98,7 @@ class PersonCardListDetailAPI(RetrieveAPIView):
         # Prepare response data
         response_data = {
             "name": person.name,
-            "phone_number": personal_info.phone_number if personal_info else None,
+            "phone_number": personal_info.main_phone_number if personal_info else None,
             "info": filtered_p_info,
             "emails": [account.email for account in accounts]
         }
@@ -99,8 +123,8 @@ class PersonCardDetailAPI(RetrieveAPIView):
             return Response({"error": "Person not found"}, status=404)
 
         # Fetch related PersonalInfo and Account data
-        personal_info = PersonalInfo.objects.filter(p_id=person).first()
-        accounts = Account.objects.filter(p_id=person)
+        personal_info = PersonalInfo.objects.filter(p_id=person.p_id).first()
+        accounts = Account.objects.filter(p_id=person.p_id)
 
         # Prepare response data
         response_data = {
@@ -114,7 +138,7 @@ class PersonCardDetailAPI(RetrieveAPIView):
 
 
 class PersonCardUpdateDestroyAPI(RetrieveUpdateDestroyAPIView):
-    serializer_class = PersonCardUpdateSerializer
+    serializer_class = PersonCardUpdateDestroySerializer
 
     def get_object(self):
         # Get p_id from the request data
