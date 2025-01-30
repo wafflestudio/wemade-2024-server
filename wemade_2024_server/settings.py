@@ -61,7 +61,7 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt",
     "oauth",
     "person",
-    "card",
+    "person_card",
     "organization_chart",
 ]
 

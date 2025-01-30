@@ -16,8 +16,11 @@ Including another URLconf
 """
 
 from django.contrib import admin
-from django.urls import include, path, re_path
+from django.urls import include, path
+from oauth.views import LoginPage
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("", include("oauth.urls")),
+    path("login/", LoginPage.as_view(), name="login"),
+    path("api/v1/auth/", include("oauth.urls")),
+    path("api/v1/personcard/", include("person_card.urls")),
 ]

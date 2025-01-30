@@ -70,20 +70,18 @@ class GoogleLoginCallback(APIView):
         if not email or not any(email.endswith(domain) for domain in email_domains):
             return Response({"error": "Email not provided by Corporation"}, status=status.HTTP_400_BAD_REQUEST)
 
-        personal_info = PersonalInfo.objects.filter(emails__contains=[email]).first()
-        if not personal_info:
-            return Response({"error": "Personal info not found"}, status=status.HTTP_404_NOT_FOUND)
-
         try:
-            person = Person.objects.get(personal_info=personal_info)
-        except Person.DoesNotExist:
-            person = Person.objects.create(personal_info=personal_info, name=personal_info.name)
-
-        try:
-            user = OauthInfo.objects.get(oauth_id=sub)
+            user = OauthInfo.objects.get(username=sub)
         except OauthInfo.DoesNotExist:
+            personal_info = PersonalInfo.objects.filter(emails__contains=[email]).first()
+            if not personal_info:
+                return Response({"error": "Personal info not found"}, status=status.HTTP_404_NOT_FOUND)
+            try:
+                person = Person.objects.get(personal_info=personal_info)
+            except Person.DoesNotExist:
+                person = Person.objects.create(personal_info=personal_info, name=personal_info.name)
             OauthInfo.objects.filter(email=email).delete()
-            user = OauthInfo.objects.create(person=person, oauth_id=sub, oauth_email=email, oauth_provider="google")
+            user = OauthInfo.objects.create(person=person, username=sub, email=email, oauth_provider="google")
 
         refresh = RefreshToken.for_user(user)
         access_token = str(refresh.access_token)
