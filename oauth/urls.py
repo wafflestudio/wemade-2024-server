@@ -1,5 +1,5 @@
 from django.urls import include, path, re_path
-from oauth.views import GoogleLogin, GoogleLoginCallback, LoginPage, ProtectedView
+from oauth.views import GoogleLogin, LoginPage, GoogleLoginCallback, TestPage
 
 urlpatterns = [
     path("login/", LoginPage.as_view(), name="login"),
@@ -12,5 +12,5 @@ urlpatterns = [
         GoogleLoginCallback.as_view(),
         name="google_login_callback",
     ),
-    path("api/v1/auth/test/", ProtectedView.as_view(), name="test"),
+    path("api/v1/auth/test/", TestPage.as_view(), name="test"),
 ]
