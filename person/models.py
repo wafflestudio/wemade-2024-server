@@ -10,6 +10,7 @@ class PersonalInfo(models.Model):
 class Person(models.Model):
     personal_info = models.OneToOneField(PersonalInfo, on_delete=models.SET_NULL, null=True)
     name = models.CharField(max_length=100)
+    roles = models.JSONField(null=True)
 
     class Meta:
         db_table = 'person'
