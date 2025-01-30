@@ -61,6 +61,8 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt",
     "oauth",
     "person",
+    "card",
+    "organization_chart",
 ]
 
 MIDDLEWARE = [

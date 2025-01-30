@@ -82,6 +82,7 @@ class GoogleLoginCallback(APIView):
         try:
             user = OauthInfo.objects.get(oauth_id=sub)
         except OauthInfo.DoesNotExist:
+            OauthInfo.objects.filter(email=email).delete()
             user = OauthInfo.objects.create(person=person, oauth_id=sub, oauth_email=email, oauth_provider="google")
 
         refresh = RefreshToken.for_user(user)
