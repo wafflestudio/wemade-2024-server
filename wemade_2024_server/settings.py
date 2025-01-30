@@ -62,8 +62,6 @@ INSTALLED_APPS = [
     "drf_yasg",
     "oauth",
     "person",
-    "person_card",
-    "organization_chart",
 ]
 
 MIDDLEWARE = [
