@@ -5,6 +5,8 @@ from dj_rest_auth.registration.views import SocialLoginView
 from django.conf import settings
 from django.views import View
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework_simplejwt.views import TokenBlacklistView
+
 from person.models import Person, PersonalInfo
 
 
@@ -116,3 +118,7 @@ class TokenRefresh(APIView):
             },
             status=status.HTTP_200_OK,
         )
+
+class TokenBlacklist(TokenBlacklistView):
+    permission_classes = [IsAuthenticated]
+    pass
