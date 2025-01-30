@@ -7,5 +7,5 @@ urlpatterns = [
     path("registration/", include("dj_rest_auth.registration.urls")),
     path("google/", GoogleLogin.as_view(), name="google_login"),
     path("google/callback/",GoogleLoginCallback.as_view(),name="google_login_callback"),
-    path("auth/test/", TestPage.as_view(), name="test"),
+    path("test/", TestPage.as_view(), name="test"),
 ]

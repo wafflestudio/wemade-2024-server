@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework.authtoken",
     "rest_framework_simplejwt",
+    "drf_yasg",
     "oauth",
     "person",
     "person_card",

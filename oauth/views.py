@@ -100,10 +100,10 @@ class LoginPage(View):
     def get(self, request, *args, **kwargs):
         return redirect(f"https://accounts.google.com/o/oauth2/v2/auth?redirect_uri={settings.GOOGLE_OAUTH_CALLBACK_URL}&prompt=consent&response_type=code&client_id={settings.GOOGLE_OAUTH_CLIENT_ID}&scope=openid%20email%20profile&access_type=offline")
 
-class TestPage(View):
+class TestPage(APIView):
     permission_classes = [IsAuthenticated]
     def get(self, request, *args, **kwargs):
-        return Response({"message": "You are authenticated!"}, status=status.HTTP_200_OK)
+        return Response({"message": "You are authenticated!: " + request.user.person.name}, status=status.HTTP_200_OK)
 
 class TokenRefresh(APIView):
     permission_classes = [IsAuthenticated]
