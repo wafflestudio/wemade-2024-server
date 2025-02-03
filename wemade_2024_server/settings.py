@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework.authtoken",
     "rest_framework_simplejwt",
+    "drf_yasg",
     "oauth",
     "person",
 ]
@@ -227,3 +228,5 @@ SIMPLE_JWT = {
     "USER_ID_FIELD": "id",
     "USER_ID_CLAIM": "user_id",
 }
+
+AUTH_USER_MODEL = 'oauth.OauthInfo'
