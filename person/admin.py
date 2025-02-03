@@ -6,3 +6,4 @@ from .models import Person, PersonalInfo, Account
 admin.site.register(Person)
 admin.site.register(PersonalInfo)
 admin.site.register(Account)
+

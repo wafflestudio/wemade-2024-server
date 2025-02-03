@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework.authtoken",
     "rest_framework_simplejwt",
+    "drf_yasg",
     "oauth",
     "person",
     "personCard",
@@ -118,10 +119,15 @@ WSGI_APPLICATION = "wemade_2024_server.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "wemade-2024-server-database",
+        "USER": os.environ.get("DB_USER"),
+        "PASSWORD": os.environ.get("DB_PASSWORD"),
+        "HOST": os.environ.get("DB_HOST"),
+        "PORT": "5432",
     }
 }
+
 
 
 
@@ -230,3 +236,4 @@ SIMPLE_JWT = {
 }
 
 APPEND_SLASH = True
+AUTH_USER_MODEL = 'oauth.OauthInfo'
