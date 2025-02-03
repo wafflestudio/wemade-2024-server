@@ -3,7 +3,7 @@ from django.db import models
 from person.models import Person
 
 class OauthInfo(AbstractUser):
-    person = models.ForeignKey(Person, on_delete=models.CASCADE, null=True)
+    person = models.ForeignKey(Person, on_delete=models.SET_NULL, null=True)
     username = models.CharField(max_length=255, unique=True)
     email = models.EmailField()
     oauth_provider = models.CharField(max_length=255)
