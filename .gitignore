@@ -269,3 +269,5 @@ fabric.properties
 
 ### ElasticBeanstalk ###
 .elasticbeanstalk/
+
+person/fixtures/personal_info.json

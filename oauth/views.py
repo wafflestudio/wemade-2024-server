@@ -5,6 +5,8 @@ from dj_rest_auth.registration.views import SocialLoginView
 from django.conf import settings
 from django.views import View
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework_simplejwt.views import TokenBlacklistView
+
 from person.models import Person, PersonalInfo
 
 
@@ -15,7 +17,7 @@ class GoogleLogin(SocialLoginView):
     client_class = OAuth2Client
 
 from django.conf import settings
-from django.contrib.auth.models import User
+from oauth.models import OauthInfo
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -62,26 +64,24 @@ class GoogleLoginCallback(APIView):
 
         userinfo = userinfo_response.json()
         email = userinfo.get("email")
-        name = userinfo.get("name")
+        sub = userinfo.get("id")
 
         email_domains = ["@wemade.com", "@wemadeconnect.com", "@gmail.com", "@snu.ac.kr"]
         if not email or not any(email.endswith(domain) for domain in email_domains):
             return Response({"error": "Email not provided by Corporation"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            personal_info = PersonalInfo.objects.get(email=email)
-        except PersonalInfo.DoesNotExist:
-            return Response({"error": "Personal Info not found"}, status=status.HTTP_404_NOT_FOUND)
-
-        try:
-            user = User.objects.get(email=email)
-        except User.DoesNotExist:
-            user = User.objects.create_user(username=email, email=email)
-
-        try:
-            person = Person.objects.get(user=user)
-        except Person.DoesNotExist:
-            person = Person.objects.create(personal_info=personal_info, user=user)
+            user = OauthInfo.objects.get(username=sub)
+        except OauthInfo.DoesNotExist:
+            personal_info = PersonalInfo.objects.filter(emails__contains=[email]).first()
+            if not personal_info:
+                return Response({"error": "Personal info not found"}, status=status.HTTP_404_NOT_FOUND)
+            try:
+                person = Person.objects.get(personal_info=personal_info)
+            except Person.DoesNotExist:
+                person = Person.objects.create(personal_info=personal_info, name=personal_info.name)
+            OauthInfo.objects.filter(email=email).delete()
+            user = OauthInfo.objects.create(person=person, username=sub, email=email, oauth_provider="google")
 
         refresh = RefreshToken.for_user(user)
         access_token = str(refresh.access_token)
@@ -90,10 +90,6 @@ class GoogleLoginCallback(APIView):
             {
                 "access_token": access_token,
                 "refresh_token": str(refresh),
-                "user": {
-                    "id": user.id,
-                    "email": user.email,
-                },
             },
             status=status.HTTP_200_OK,
         )
@@ -103,7 +99,25 @@ class LoginPage(View):
     permission_classes = [AllowAny]
     def get(self, request, *args, **kwargs):
         return redirect(f"https://accounts.google.com/o/oauth2/v2/auth?redirect_uri={settings.GOOGLE_OAUTH_CALLBACK_URL}&prompt=consent&response_type=code&client_id={settings.GOOGLE_OAUTH_CLIENT_ID}&scope=openid%20email%20profile&access_type=offline")
-class ProtectedView(APIView):
+
+class TestPage(APIView):
     permission_classes = [IsAuthenticated]
-    def get(self, request):
-        return Response({"message": f"Hello, {request.user.email}!"})
+    def get(self, request, *args, **kwargs):
+        return Response({"message": "You are authenticated!: " + request.user.person.name}, status=status.HTTP_200_OK)
+
+class TokenRefresh(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self, request, *args, **kwargs):
+        refresh = RefreshToken(request.data.get("refresh_token"))
+        access_token = str(refresh.access_token)
+        return Response(
+            {
+                "access_token": access_token,
+                "refresh_token": str(refresh),
+            },
+            status=status.HTTP_200_OK,
+        )
+
+class TokenBlacklist(TokenBlacklistView):
+    permission_classes = [IsAuthenticated]
+    pass
