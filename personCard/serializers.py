@@ -27,6 +27,10 @@ class PersonCardListDetailSerializer(serializers.ModelSerializer):
         model = Person
         fields = ['name', 'phone_number', 'info', 'emails']
 
+    def get_emails(self, obj):
+        account = Account.objects.filter(p_id=obj).first()
+        return account.email if account else None
+
 
 class PersonCardDetailSerializer(serializers.ModelSerializer):
     name = serializers.CharField()
@@ -38,11 +42,21 @@ class PersonCardDetailSerializer(serializers.ModelSerializer):
         model = Person
         fields = ['name', 'phone_number', 'info', 'emails']
 
+    def get_emails(self, obj):
+        account = Account.objects.filter(p_id=obj).first()
+        return account.email if account else None
+
 
 class PersonCardUpdateSerializer(serializers.ModelSerializer):
-    main_phone_number = serializers.CharField(max_length=13, required=False)
-    p_info = serializers.JSONField(required=False)
+    name = serializers.CharField()
+    phone_number = serializers.CharField(required=False, allow_null=True)
+    info = serializers.JSONField(required=False, allow_null=True)
+    emails = serializers.ListField(child=serializers.EmailField(), required=False, allow_null=True)
 
     class Meta:
         model = PersonalInfo
-        fields = ['main_phone_number', 'p_info']
+        fields = ['name', 'phone_number', 'info', 'emails']
+
+    def get_emails(self, obj):
+        account = Account.objects.filter(p_id=obj).first()
+        return account.email if account else None

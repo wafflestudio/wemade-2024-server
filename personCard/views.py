@@ -144,21 +144,37 @@ class PersonCardDetailAPI(RetrieveAPIView):
 class PersonCardUpdateAPI(RetrieveUpdateDestroyAPIView):
     serializer_class = PersonCardUpdateSerializer
 
-    def get_object(self):
-        # Get p_id from the request data
+    def retrieve(self, request, *args, **kwargs):
+        # Get p_id from the URL kwargs
         p_id = kwargs.get('p_id')
 
         if not p_id:
-            raise ValueError("p_id is required")
+            return Response({"error": "p_id is required"}, status=400)
+
+        try:
+            # Fetch the Person object
+            person = Person.objects.get(p_id=p_id)
+        except Person.DoesNotExist:
+            return Response({"error": "Person not found"}, status=404)
 
         try:
             # Fetch the related PersonalInfo object
-            person = Person.objects.get(p_id=p_id)
-            personal_info = PersonalInfo.objects.get(p_id=person)
-        except (Person.DoesNotExist, PersonalInfo.DoesNotExist):
-            raise ValueError("PersonalInfo not found")
+            personal_info = PersonalInfo.objects.get(p_id=person.p_id)
+        except PersonalInfo.DoesNotExist:
+            return Response({"error": "PersonalInfo not found"}, status=404)
 
-        return personal_info
+        # Fetch related Account data
+        accounts = Account.objects.filter(p_id=person.p_id)
+
+        # Prepare response data
+        response_data = {
+            "name": person.name,
+            "phone_number": personal_info.phone_number if personal_info else None,
+            "info": personal_info.p_info if personal_info else None,
+            "emails": [account.email for account in accounts],
+        }
+
+        return Response(response_data, status=200)
 
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
