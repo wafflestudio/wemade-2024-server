@@ -1,16 +1,5 @@
 from django.db import models
 
-class Person(models.Model):
-    p_id = models.BigAutoField(primary_key=True) # p_id를 고유값으로 설정
-    name = models.CharField(max_length=100)
-    personal_info = models.OneToOneField(PersonalInfo, on_delete=models.SET_NULL, null=True)
-    roles = models.JSONField(null=True)
-
-
-    class Meta:
-        db_table = 'person'
-        app_label = 'person'
-
 
 class PersonalInfo(models.Model):
     ## 가정: 생일 & 이름이 같은 사람은 없다
@@ -23,3 +12,14 @@ class PersonalInfo(models.Model):
 
     class Meta:
         db_table = 'personal_info'
+
+class Person(models.Model):
+    p_id = models.BigAutoField(primary_key=True) # p_id를 고유값으로 설정
+    name = models.CharField(max_length=100)
+    personal_info = models.OneToOneField(PersonalInfo, on_delete=models.SET_NULL, null=True)
+    roles = models.JSONField(null=True)
+
+
+    class Meta:
+        db_table = 'person'
+        app_label = 'person'
