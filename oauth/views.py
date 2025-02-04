@@ -29,16 +29,19 @@ class GoogleLoginCallback(APIView):
 
     def get(self, request, *args, **kwargs):
         code = request.GET.get("code")
+        profile = request.GET.get("profile")
 
         if not code:
             return Response({"error": "Authorization code not provided"}, status=status.HTTP_400_BAD_REQUEST)
+        if not profile:
+            return Response({"error": "Profile not provided"}, status=status.HTTP_400_BAD_REQUEST)
 
         token_url = "https://oauth2.googleapis.com/token"
         payload = {
             "code": code,
             "client_id": settings.GOOGLE_OAUTH_CLIENT_ID,
             "client_secret": settings.GOOGLE_OAUTH_CLIENT_SECRET,
-            "redirect_uri": settings.GOOGLE_OAUTH_CALLBACK_URL,
+            "redirect_uri": settings.GOOGLE_OAUTH_CALLBACK_URLS[profile],
             "grant_type": "authorization_code",
         }
 
