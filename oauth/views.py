@@ -1,20 +1,10 @@
 from allauth.core.internal.http import redirect
-from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
-from allauth.socialaccount.providers.oauth2.client import OAuth2Client
-from dj_rest_auth.registration.views import SocialLoginView
-from django.conf import settings
 from django.views import View
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.views import TokenBlacklistView
 
 from person.models import Person, PersonalInfo
 
-
-class GoogleLogin(SocialLoginView):
-    permission_classes = [AllowAny]
-    adapter_class = GoogleOAuth2Adapter
-    callback_url = settings.GOOGLE_OAUTH_CALLBACK_URL
-    client_class = OAuth2Client
 
 from django.conf import settings
 from oauth.models import OauthInfo
@@ -96,12 +86,6 @@ class GoogleLoginCallback(APIView):
             },
             status=status.HTTP_200_OK,
         )
-
-
-class LoginPage(View):
-    permission_classes = [AllowAny]
-    def get(self, request, *args, **kwargs):
-        return redirect(f"https://accounts.google.com/o/oauth2/v2/auth?redirect_uri={settings.GOOGLE_OAUTH_CALLBACK_URL}&prompt=consent&response_type=code&client_id={settings.GOOGLE_OAUTH_CLIENT_ID}&scope=openid%20email%20profile&access_type=offline")
 
 class TestPage(APIView):
     permission_classes = [IsAuthenticated]
