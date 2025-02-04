@@ -1,62 +1,66 @@
 from rest_framework import serializers
-from person.models import Person, PersonalInfo
+from person.models import Person, PersonalInfo, PersonCardInfo
 
 
 class PersonCardListSerializer(serializers.ModelSerializer):
-    email = serializers.SerializerMethodField()
+    emails = serializers.SerializerMethodField()
     corporation = serializers.CharField(default="")
     team = serializers.CharField(default="")
-    role = serializers.CharField(default="")
+    role = serializers.JSONField(required=False, allow_null=True)
 
     class Meta:
         model = Person
-        fields = ['p_id', 'name', 'email', 'corporation', 'team', 'role']
+        fields = ['p_id', 'name', 'emails', 'corporation', 'team', 'role']
 
-    def get_email(self, obj):
-        account = Account.objects.filter(p_id=obj).first()
-        return account.email if account else None
+    def get_emails(self, obj):
+        if obj.personal_info and isinstance(obj.personal_info.emails, list):
+            return obj.personal_info.emails
+        return []
 
 
 class PersonCardListDetailSerializer(serializers.ModelSerializer):
-    name = serializers.CharField()
-    phone_number = serializers.CharField(required=False, allow_null=True)
-    info = serializers.ListField(child=serializers.JSONField(), required=False, allow_null=True)
-    emails = serializers.ListField(child=serializers.EmailField(), required=False, allow_null=True)
+    phone_number = serializers.CharField(source='personal_info.main_phone_number', required=False, allow_null=True)
+    info = serializers.JSONField(source='personal_info.p_info', required=False, allow_null=True)
+    emails = serializers.SerializerMethodField()
+    p_card_info = serializers.JSONField(source='personal_info.p_card_info.p_card_info', required=False, allow_null=True)
 
     class Meta:
         model = Person
-        fields = ['name', 'phone_number', 'info', 'emails']
+        fields = ['name', 'phone_number', 'info', 'emails', 'p_card_info']
 
     def get_emails(self, obj):
-        account = Account.objects.filter(p_id=obj).first()
-        return account.email if account else None
+        if obj.personal_info and isinstance(obj.personal_info.emails, list):
+            return obj.personal_info.emails
+        return []
 
 
 class PersonCardDetailSerializer(serializers.ModelSerializer):
-    name = serializers.CharField()
-    phone_number = serializers.CharField(required=False, allow_null=True)
-    info = serializers.JSONField(required=False, allow_null=True)
-    emails = serializers.ListField(child=serializers.EmailField(), required=False, allow_null=True)
+    phone_number = serializers.CharField(source='personal_info.main_phone_number', required=False, allow_null=True)
+    info = serializers.JSONField(source='personal_info.p_info', required=False, allow_null=True)
+    emails = serializers.SerializerMethodField()
+    p_card_info = serializers.JSONField(source='personal_info.p_card_info.p_card_info', required=False, allow_null=True)
 
     class Meta:
         model = Person
-        fields = ['name', 'phone_number', 'info', 'emails']
+        fields = ['name', 'phone_number', 'info', 'emails', 'p_card_info']
 
     def get_emails(self, obj):
-        account = Account.objects.filter(p_id=obj).first()
-        return account.email if account else None
+        if obj.personal_info and isinstance(obj.personal_info.emails, list):
+            return obj.personal_info.emails
+        return []
 
 
 class PersonCardUpdateSerializer(serializers.ModelSerializer):
-    name = serializers.CharField()
-    phone_number = serializers.CharField(required=False, allow_null=True)
-    info = serializers.JSONField(required=False, allow_null=True)
-    emails = serializers.ListField(child=serializers.EmailField(), required=False, allow_null=True)
+    phone_number = serializers.CharField(source='main_phone_number', required=False, allow_null=True)
+    info = serializers.JSONField(source='p_info', required=False, allow_null=True)
+    emails = serializers.SerializerMethodField()
+    p_card_info = serializers.JSONField(source='p_card_info.p_card_info', required=False, allow_null=True)
 
     class Meta:
         model = PersonalInfo
-        fields = ['name', 'phone_number', 'info', 'emails']
+        fields = ['name', 'phone_number', 'info', 'emails', 'p_card_info']
 
     def get_emails(self, obj):
-        account = Account.objects.filter(p_id=obj).first()
-        return account.email if account else None
+        if obj and isinstance(obj.emails, list):
+            return obj.emails
+        return []
