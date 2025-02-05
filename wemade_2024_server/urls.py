@@ -26,7 +26,7 @@ schema_view = get_schema_view(
     openapi.Info(
         title="Wemade 2024 API",
         default_version='v1',
-        description="Test description",
+        description="",
         terms_of_service="",
         contact=openapi.Contact(email="dlacksdud2@gmail.com"),
         license=openapi.License(name=""),
