@@ -11,13 +11,14 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
-import os
 from dotenv import load_dotenv
-
-load_dotenv(".env")
+from datetime import timedelta
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR / ".env")
+
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 CSRF_TRUSTED_ORIGINS= ['https://*.azurewebsites.net']
 
@@ -62,6 +63,7 @@ INSTALLED_APPS = [
     "drf_yasg",
     "oauth",
     "person",
+    "personCard",
 ]
 
 MIDDLEWARE = [
@@ -111,7 +113,6 @@ DATABASES = {
         "PORT": "5432",
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -165,6 +166,7 @@ CORS_ORIGIN_ALLOW_ALL = True
 GOOGLE_OAUTH_CLIENT_ID = os.getenv("GOOGLE_OAUTH_CLIENT_ID")
 GOOGLE_OAUTH_CLIENT_SECRET = os.getenv("GOOGLE_OAUTH_CLIENT_SECRET")
 GOOGLE_OAUTH_CALLBACK_URLS = {"prod": os.getenv("GOOGLE_OAUTH_CALLBACK_URL_PROD"), "dev": os.getenv("GOOGLE_OAUTH_CALLBACK_URL_DEV"), "local": os.getenv("GOOGLE_OAUTH_CALLBACK_URL_LOCAL")}
+GOOGLE_OAUTH_CALLBACK_URL_BACKEND = "http://localhost:8000/api/v1/auth/google/callback"
 
 SOCIALACCOUNT_PROVIDERS = {
     "google": {
@@ -205,8 +207,6 @@ REST_FRAMEWORK = {
     ),
 }
 
-from datetime import timedelta
-
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=180),  # 6 months
     "REFRESH_TOKEN_LIFETIME": timedelta(days=365),  # Optional, for token refresh
@@ -219,4 +219,5 @@ SIMPLE_JWT = {
     "USER_ID_CLAIM": "user_id",
 }
 
+APPEND_SLASH = True
 AUTH_USER_MODEL = 'oauth.OauthInfo'
