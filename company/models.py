@@ -1,13 +1,14 @@
 from django.db import models
 from person.models import Person
 
-class Corporate(models.Model):
+
+class Corporation(models.Model):
     c_id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=255)
-    sub_teams = models.ManyToManyField('Team', related_name='corporate_sub_teams', blank=True)  # 하위 팀들
+    sub_teams = models.ManyToManyField('Team', related_name='corporation_sub_teams', blank=True)  # 하위 팀들
 
     class Meta:
-        db_table = 'corporate'
+        db_table = 'corporation'
 
 
 class Team(models.Model):
@@ -15,7 +16,7 @@ class Team(models.Model):
     name = models.CharField(max_length=255)
 
     # 소속된 법인
-    corporate = models.ForeignKey(Corporate, related_name='teams', on_delete=models.CASCADE, null=True, blank=True)
+    corporation = models.ForeignKey(Corporation, related_name='teams', on_delete=models.CASCADE, null=True, blank=True)
 
     # 팀들 사이 관계
     sub_teams = models.ManyToManyField('self', related_name='parent_teams', symmetrical=False, blank=True)  # 하위 팀들
