@@ -64,3 +64,22 @@ class PersonCardUpdateSerializer(serializers.ModelSerializer):
         if obj and isinstance(obj.emails, list):
             return obj.emails
         return []
+
+    def update(self, instance, validated_data):
+        p_card_info_data = validated_data.pop('p_card_info', None)
+        super().update(instance, validated_data)
+        p_card_info = instance.p_card_info
+        if not p_card_info:
+            p_card_info = PersonCardInfo.objects.create()
+            instance.p_card_info = p_card_info
+            instance.save()
+        if p_card_info_data:
+            p_card_info.p_card_info = p_card_info_data
+            p_card_info.save()
+        return instance
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        if 'p_card_info' in ret and isinstance(ret['p_card_info'], dict) and 'p_card_info' in ret['p_card_info']:
+            ret['p_card_info'] = ret['p_card_info']['p_card_info']
+        return ret

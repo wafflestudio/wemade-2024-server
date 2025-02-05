@@ -43,9 +43,12 @@ class PersonCardDetailAPI(RetrieveAPIView):
 
 class PersonCardUpdateAPI(RetrieveUpdateDestroyAPIView):
     serializer_class = PersonCardUpdateSerializer
+    queryset = PersonalInfo.objects.all()
+    lookup_field = 'person__p_id'
+    lookup_url_kwarg = 'p_id'
 
     def retrieve(self, request, *args, **kwargs):
-        personal_info = get_object_or_404(PersonalInfo, p_id=kwargs.get('p_id'))
+        personal_info = get_object_or_404(PersonalInfo, person__p_id=kwargs.get('p_id'))
         return Response(self.get_serializer(personal_info).data, status=200)
 
     def update(self, request, *args, **kwargs):
