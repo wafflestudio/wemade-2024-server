@@ -4,13 +4,14 @@ from person.models import Person, PersonalInfo, PersonCardInfo
 
 class PersonCardListSerializer(serializers.ModelSerializer):
     emails = serializers.SerializerMethodField()
+    phone_number = serializers.CharField(source='personal_info.main_phone_number', required=False, allow_null=True)
     corporation = serializers.CharField(default="")
     team = serializers.CharField(default="")
     role = serializers.JSONField(required=False, allow_null=True)
 
     class Meta:
         model = Person
-        fields = ['p_id', 'name', 'emails', 'corporation', 'team', 'role']
+        fields = ['p_id', 'name', 'emails', 'phone_number', 'corporation', 'team', 'role']
 
     def get_emails(self, obj):
         if obj.personal_info and isinstance(obj.personal_info.emails, list):
