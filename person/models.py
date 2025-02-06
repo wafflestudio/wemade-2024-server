@@ -8,7 +8,7 @@ class PersonCardInfo(models.Model):
     class Meta:
         db_table = 'personCard_info'
 
-# 인사팀/최초 1회 입력: 전화번호, 생년월일, 사내 보직 history
+#p_info: 공개정보(자격증 등), p_card_info(비공개/인사카드 정보)
 class PersonalInfo(models.Model):
     main_phone_number = models.TextField(max_length=13, null=True)  # '010-0000-0000' 형태, 여러 개일 수 있음
     name = models.CharField(max_length=100, null=True)
