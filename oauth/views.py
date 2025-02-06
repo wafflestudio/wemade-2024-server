@@ -7,7 +7,7 @@ from person.models import Person, PersonalInfo
 
 
 from django.conf import settings
-from oauth.models import OauthInfo
+from oauth.models import OauthInfo, EmailDomain
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -62,7 +62,8 @@ class GoogleLoginCallback(APIView):
         email = userinfo.get("email")
         sub = userinfo.get("id")
 
-        email_domains = ["@wemade.com", "@wemadeconnect.com", "@gmail.com", "@snu.ac.kr"]
+        # @gmail.com and @snu.ac.kr are allowed for testing
+        email_domains = ["@wemade.com", "@gmail.com", "@snu.ac.kr"] + list(EmailDomain.objects.values_list("domain", flat=True))
         if not email or not any(email.endswith(domain) for domain in email_domains):
             return Response({"error": "Email not provided by Corporation"}, status=status.HTTP_400_BAD_REQUEST)
 
