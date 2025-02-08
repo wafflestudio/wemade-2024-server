@@ -1,3 +1,7 @@
-from django.shortcuts import render
+from django.views import View
+from .models import StorageFile
+from .serializers import FileSerializer
 
-# Create your views here.
+class FileUploadView(View):
+    serializer_class = FileSerializer
+    queryset = StorageFile.objects.all()
