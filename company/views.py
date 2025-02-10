@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404
-from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.generics import ListAPIView, CreateAPIView, RetrieveAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.response import Response
 from .models import *
 from .serializers import *
@@ -22,11 +22,11 @@ class CorpDetailAPIView(RetrieveAPIView):
     serializer_class = CorpDetailSerializer
 
     def retrieve(self, request, *args, **kwargs):
-        corporation = get_object_or_404(Corporation, p_id=kwargs.get('c_id'))
+        corporation = get_object_or_404(Corporation, c_id=kwargs.get('c_id'))  # ✅ `p_id` → `c_id`
         return Response(self.get_serializer(corporation).data, status=200)
 
 
-class CorpCreateAPIView(ListCreateAPIView):
+class CorpCreateAPIView(CreateAPIView):
     serializer_class = CorpCreateSerializer
 
     def create(self, request, *args, **kwargs):
@@ -73,11 +73,11 @@ class TeamDetailAPIView(RetrieveAPIView):
     serializer_class = TeamDetailSerializer
 
     def retrieve(self, request, *args, **kwargs):
-        team = get_object_or_404(Team, p_id=kwargs.get('t_id'))
+        team = get_object_or_404(Team, t_id=kwargs.get('t_id'))
         return Response(self.get_serializer(team).data, status=200)
 
 
-class TeamCreateAPIView(ListCreateAPIView):
+class TeamCreateAPIView(CreateAPIView):
     serializer_class = TeamCreateSerializer
 
     def create(self, request, *args, **kwargs):

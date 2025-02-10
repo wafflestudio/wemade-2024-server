@@ -19,8 +19,8 @@ class Team(models.Model):
     corporation = models.ForeignKey(Corporation, related_name='teams', on_delete=models.CASCADE, null=True, blank=True)
 
     # 팀들 사이 관계
-    sub_teams = models.ManyToManyField('self', related_name='parent_teams', symmetrical=False, blank=True)  # 하위 팀들
-    parent_teams = models.ManyToManyField('self', related_name='child_teams', symmetrical=False, blank=True)  # 상위 조직들
+    sub_teams = models.ManyToManyField('self', related_name='super_teams', symmetrical=False, blank=True)  # 하위 팀들
+    parent_teams = models.ManyToManyField('self', related_name='lower_teams', symmetrical=False, blank=True)  # 상위 조직들
 
     # 팀 정보
     members = models.ManyToManyField(Person, related_name='teams', blank=True)  # 팀원 목록
