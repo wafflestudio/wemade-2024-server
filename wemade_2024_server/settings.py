@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     "oauth",
     "person",
     "personCard",
+    "files"
 ]
 
 MIDDLEWARE = [
@@ -221,6 +222,20 @@ SIMPLE_JWT = {
 
 APPEND_SLASH = True
 AUTH_USER_MODEL = 'oauth.OauthInfo'
+
+STORAGES = {
+    "default": {
+        "BACKEND": "storages.backends.azure_storage.AzureStorage",
+        "OPTIONS": {
+            "account_name": os.getenv("AZURE_ACCOUNT_NAME"),
+            "account_key": os.getenv("AZURE_ACCOUNT_KEY"),
+            "azure_container": os.getenv("AZURE_CONTAINER_NAME"),
+        },
+    },
+    "staticfiles": {
+        "BACKEND": "storages.backends.azure_storage.AzureStorage",
+    }
+}
 
 SWAGGER_SETTINGS = {
     'SECURITY_DEFINITIONS': {
