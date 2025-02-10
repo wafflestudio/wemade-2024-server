@@ -7,7 +7,7 @@ from person.models import Person, PersonalInfo
 
 
 from django.conf import settings
-from oauth.models import OauthInfo
+from oauth.models import OauthInfo, EmailDomain
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -23,15 +23,18 @@ class GoogleLoginCallback(APIView):
 
         if not code:
             return Response({"error": "Authorization code not provided"}, status=status.HTTP_400_BAD_REQUEST)
-        if not profile:
-            return Response({"error": "Profile not provided"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            redirect_uri = settings.GOOGLE_OAUTH_CALLBACK_URLS[profile]
+        except KeyError:
+            redirect_uri = settings.GOOGLE_OAUTH_CALLBACK_URL_BACKEND
 
         token_url = "https://oauth2.googleapis.com/token"
         payload = {
             "code": code,
             "client_id": settings.GOOGLE_OAUTH_CLIENT_ID,
             "client_secret": settings.GOOGLE_OAUTH_CLIENT_SECRET,
-            "redirect_uri": settings.GOOGLE_OAUTH_CALLBACK_URLS[profile],
+            "redirect_uri": redirect_uri,
             "grant_type": "authorization_code",
         }
 
@@ -59,7 +62,8 @@ class GoogleLoginCallback(APIView):
         email = userinfo.get("email")
         sub = userinfo.get("id")
 
-        email_domains = ["@wemade.com", "@wemadeconnect.com", "@gmail.com", "@snu.ac.kr"]
+        # @gmail.com and @snu.ac.kr are allowed for testing
+        email_domains = ["@wemade.com", "@gmail.com", "@snu.ac.kr"] + list(EmailDomain.objects.values_list("domain", flat=True))
         if not email or not any(email.endswith(domain) for domain in email_domains):
             return Response({"error": "Email not provided by Corporation"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -108,3 +112,9 @@ class TokenRefresh(APIView):
 class TokenBlacklist(TokenBlacklistView):
     permission_classes = [IsAuthenticated]
     pass
+
+
+class LoginPage(View):
+    permission_classes = [AllowAny]
+    def get(self, request, *args, **kwargs):
+        return redirect(f"https://accounts.google.com/o/oauth2/v2/auth?redirect_uri={settings.GOOGLE_OAUTH_CALLBACK_URL_BACKEND}&prompt=consent&response_type=code&client_id={settings.GOOGLE_OAUTH_CLIENT_ID}&scope=openid%20email%20profile&access_type=offline")

@@ -26,7 +26,7 @@ schema_view = get_schema_view(
     openapi.Info(
         title="Wemade 2024 API",
         default_version='v1',
-        description="Test description",
+        description="",
         terms_of_service="",
         contact=openapi.Contact(email="dlacksdud2@gmail.com"),
         license=openapi.License(name=""),
@@ -38,6 +38,8 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/v1/auth/", include("oauth.urls")),
     path("api/v1/company/", include("company.urls")),
+    path("api/v1/personCard/", include("personCard.urls")),
+    path("api/v1/files/", include("files.urls")),
 
     re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     re_path(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
