@@ -16,3 +16,12 @@ class OauthInfo(AbstractUser):
     class Meta:
         db_table = 'oauth_info'
         
+        
+class EmailDomain(models.Model):
+    domain = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.domain
+
+    class Meta:
+        db_table = 'email_domain'
