@@ -5,7 +5,9 @@ from person.models import Person
 class Corporation(models.Model):
     c_id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=255)
+
     sub_teams = models.ManyToManyField('Team', related_name='corporation_sub_teams', blank=True)  # 하위 팀들
+    hr_team_members = models.ManyToManyField(Person, related_name = 'hr_team_members', blank=True) # 인사팀 팀원들
 
     class Meta:
         db_table = 'corporation'
