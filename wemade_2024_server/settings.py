@@ -242,8 +242,8 @@ STORAGES = {
         },
     },
     "staticfiles": {
-        "BACKEND": "storages.backends.azure_storage.AzureStorage",
-    }
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
 }
 
 SWAGGER_SETTINGS = {
@@ -254,4 +254,9 @@ SWAGGER_SETTINGS = {
             'name': 'Authorization'
         }
     },
+    'USE_SESSION_AUTH': False,
 }
+
+AZURE_ACCOUNT_NAME = os.getenv("AZURE_ACCOUNT_NAME")
+AZURE_ACCOUNT_KEY = os.getenv("AZURE_ACCOUNT_KEY")
+AZURE_CONTAINER = os.getenv("AZURE_CONTAINER_NAME")
