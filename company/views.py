@@ -1,9 +1,9 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.generics import ListAPIView, CreateAPIView, RetrieveAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.response import Response
-from .models import *
 from .serializers import *
 from .paginations import *
+from rest_framework import status
 
 
 # Corporation
