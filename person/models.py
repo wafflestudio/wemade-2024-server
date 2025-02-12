@@ -44,7 +44,7 @@ class Person(models.Model):
     corporations = models.ManyToManyField('company.Corporation', related_name="corporation_persons", blank=True)
     teams = models.ManyToManyField('company.Team', related_name="team_persons", blank=True)
 
-    roles = models.JSONField(null=True, blank=True) # 내부 구조: {{"t_id": "", "role": "사원"}, {"t_id": "", "role":""},...}
+    roles = models.JSONField(null=True, blank=True) # 내부 구조: {{"t_id": "", "role": "부서원"}, {"t_id": "", "role":""},...}
 
     class Meta:
         db_table = "person"
