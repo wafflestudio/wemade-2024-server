@@ -23,23 +23,11 @@ class PersonalInfo(models.Model):
         db_table = 'personal_info'
 
 
-class PersonalHistory(models.Model):
-    start_date = models.DateTimeField()
-    end_date = models.DateTimeField(null=True)
-    t_id = models.ForeignKey(Team, on_delete=model.SET_NULL)
-    role = models.CharField(max_length=20) # 한 팀에서는 role이 하나라고 가정
-    supervisor = models.IntegerField()  # 해당 시기 team의 team_leader(p_id)
-
-    class Meta:
-        db_table = 'personal_history'
-
-
 class Person(models.Model):
     p_id = models.BigAutoField(primary_key=True)
     employee_id = models.CharField(max_length=20)  # 사번 구조에 따라 변경 필요
     name = models.CharField(max_length=100)  # 이름
     personal_info = models.OneToOneField(PersonalInfo, on_delete=models.SET_NULL, null=True)  # 퇴사 시 삭제될 개인 정보
-    personal_history = models.OneToManyField(PersonalHistory, on_delete=models.SET_NULL, null=True)  # 부서 이동 history
 
     corporations = models.ManyToManyField('company.Corporation', related_name="corporation_persons", blank=True)
     teams = models.ManyToManyField('company.Team', related_name="team_persons", blank=True)
@@ -49,4 +37,21 @@ class Person(models.Model):
     class Meta:
         db_table = "person"
         app_label = "person"
+
+
+class PersonalHistory(models.Model):
+    person = models.ForeignKey(
+        'person.Person',
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='personal_histories'
+    )
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField(null=True)
+    t_id = models.ForeignKey('company.Team', on_delete=models.SET_NULL, null=True)
+    role = models.CharField(max_length=20)  # 한 팀에서는 role이 하나라고 가정
+    supervisor = models.IntegerField()  # 해당 시기 team의 team_leader(p_id)
+
+    class Meta:
+        db_table = 'personal_history'
 
