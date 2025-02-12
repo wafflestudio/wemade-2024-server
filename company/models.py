@@ -1,12 +1,13 @@
 from django.db import models
 
+
 class Corporation(models.Model):
     c_id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=255)
 
-    sub_teams = models.ManyToManyField('Team', related_name='corporation_sub_teams', blank=True)
-    # 문자열 참조 사용: 'person.Person'
-    hr_team_members = models.ManyToManyField('person.Person', related_name='hr_team_members', blank=True)
+    sub_teams = models.ManyToManyField('company.Team', related_name='corporation_sub_teams', blank=True)
+    hr_team = models.ForeignKey('company.Team', related_name='corporation_hr_team', on_delete=models.SET_NULL, null=True)
+    #hr_team_members = models.ManyToManyField('person.Person', related_name='hr_team_members', blank=True)
 
     class Meta:
         db_table = 'corporation'
