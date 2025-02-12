@@ -4,9 +4,15 @@ from rest_framework import urls
 from .views import *
 
 urlpatterns = [
-    path('list/<int:p_id>/', PersonCardListDetailAPI.as_view(), name='person-card-list-detail'),
-    path('list/', PersonCardListAPI.as_view(), name='person-card-list'),
-    path('search/',  PersonCardSearchListAPIView.as_view(), name='person-card-search'), #query로 받도록
-    path('<int:p_id>/', PersonCardDetailAPI.as_view(), name='person-card-detail'),
-    path('<int:p_id>/update/', PersonCardUpdateAPI.as_view(), name='person-card-update'),
+    # 검색 페이지 우측 특정한 사람 공개 정보 불러오기
+    path('list/<int:p_id>/', PersonCardListDetailAPIView.as_view(), name='person-card-list-detail'),
+    # 검색 페이지에서 모든 사람 정보 불러오기
+    path('list/', PersonCardListAPIView.as_view(), name='person-card-list'),
+    # 사람 이름을 query로 받아 검색하기
+    path('search/',  PersonCardSearchListAPIView.as_view(), name='person-card-search'),
+
+    # 인사카드 업데이트
+    path('<int:p_id>/update/', PersonCardUpdateAPIView.as_view(), name='person-card-update'),
+    # 인사카드 조회
+    path('<int:p_id>/', PersonCardDetailAPIView.as_view(), name='person-card-detail'),
 ]

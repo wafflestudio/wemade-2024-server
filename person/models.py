@@ -1,6 +1,9 @@
 from django.db import models
+from person.models import *
+from company.models import * #company branch와 병합 후 주석 해제
 
 
+# p_info: 공개정보(자격증 등), p_card_info(비공개/인사카드 정보)
 class PersonCardInfo(models.Model):
     p_card_info = models.JSONField(null=True, blank=True)
 
@@ -9,12 +12,12 @@ class PersonCardInfo(models.Model):
 
 
 class PersonalInfo(models.Model):
-    main_phone_number = models.TextField(max_length=13, null=True)
+    main_phone_number = models.TextField(max_length=13, null=True)  # '010-0000-0000' 형태
     name = models.CharField(max_length=100, null=True)
     emails = models.JSONField()
-    birthday = models.TextField(max_length=10, null=True)
-    p_info = models.JSONField(null=True, blank=True)
-    p_card_info = models.OneToOneField(PersonCardInfo, on_delete=models.CASCADE, null=True)
+    birthday = models.TextField(max_length=10, null=True) # 2000-01-01 형태
+    p_info = models.JSONField(null=True, blank=True)  # 공개 정보
+    p_card_info = models.OneToOneField(PersonCardInfo, on_delete=models.CASCADE, null=True) # 비공개 정보
 
     class Meta:
         db_table = 'personal_info'
@@ -25,7 +28,6 @@ class Person(models.Model):
     name = models.CharField(max_length=100)
     personal_info = models.OneToOneField(PersonalInfo, on_delete=models.SET_NULL, null=True)
 
-    # 직접 import 없이 문자열 참조 사용
     corporations = models.ManyToManyField('company.Corporation', related_name="corporation_persons", blank=True)
     teams = models.ManyToManyField('company.Team', related_name="team_persons", blank=True)
 
@@ -34,3 +36,4 @@ class Person(models.Model):
     class Meta:
         db_table = "person"
         app_label = "person"
+

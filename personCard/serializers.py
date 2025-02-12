@@ -23,11 +23,10 @@ class PersonCardListDetailSerializer(serializers.ModelSerializer):
     phone_number = serializers.CharField(source='personal_info.main_phone_number', required=False, allow_null=True)
     info = serializers.JSONField(source='personal_info.p_info', required=False, allow_null=True)
     emails = serializers.SerializerMethodField()
-    p_card_info = serializers.JSONField(source='personal_info.p_card_info.p_card_info', required=False, allow_null=True)
 
     class Meta:
         model = Person
-        fields = ['name', 'phone_number', 'info', 'emails', 'p_card_info']
+        fields = ['name', 'phone_number', 'info', 'emails']
 
     def get_emails(self, obj):
         if obj.personal_info and isinstance(obj.personal_info.emails, list):
