@@ -48,7 +48,7 @@ class PersonalHistory(models.Model):
     )
     start_date = models.DateTimeField()
     end_date = models.DateTimeField(null=True)
-    t_id = models.ForeignKey('company.Team', on_delete=models.SET_NULL, null=True)
+    team = models.ForeignKey('company.Team', on_delete=models.SET_NULL, null=True)
     role = models.CharField(max_length=20)  # 한 팀에서는 role이 하나라고 가정
     supervisor = models.IntegerField()  # 해당 시기 team의 team_leader(p_id)
 
