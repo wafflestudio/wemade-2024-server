@@ -1,13 +1,12 @@
 from django.db import models
-from person.models import Person
-
 
 class Corporation(models.Model):
     c_id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=255)
 
-    sub_teams = models.ManyToManyField('Team', related_name='corporation_sub_teams', blank=True)  # 하위 팀들
-    hr_team_members = models.ManyToManyField(Person, related_name = 'hr_team_members', blank=True) # 인사팀 팀원들
+    sub_teams = models.ManyToManyField('Team', related_name='corporation_sub_teams', blank=True)
+    # 문자열 참조 사용: 'person.Person'
+    hr_team_members = models.ManyToManyField('person.Person', related_name='hr_team_members', blank=True)
 
     class Meta:
         db_table = 'corporation'
@@ -17,16 +16,14 @@ class Team(models.Model):
     t_id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=255)
 
-    # 소속된 법인
     corporation = models.ForeignKey(Corporation, related_name='teams', on_delete=models.CASCADE, null=True, blank=True)
 
-    # 팀들 사이 관계
-    sub_teams = models.ManyToManyField('self', related_name='super_teams', symmetrical=False, blank=True)  # 하위 팀들
-    parent_teams = models.ManyToManyField('self', related_name='lower_teams', symmetrical=False, blank=True)  # 상위 조직들
+    sub_teams = models.ManyToManyField('self', related_name='super_teams', symmetrical=False, null=True,  blank=True)
+    parent_teams = models.ManyToManyField('self', related_name='lower_teams', symmetrical=False, null=True, blank=True)
 
-    # 팀 정보
-    members = models.ManyToManyField(Person, related_name='teams', blank=True)  # 팀원 목록
-    team_leader = models.ForeignKey(Person, related_name='leading_teams', on_delete=models.SET_NULL, null=True, blank=True)  # 팀장 (1명)
+    # 문자열 참조 사용
+    members = models.ManyToManyField('person.Person', related_name='member_of_teams', blank=True)
+    team_leader = models.ForeignKey('person.Person', related_name='leading_teams', on_delete=models.SET_NULL, null=True, blank=True)
 
     class Meta:
         db_table = 'team'

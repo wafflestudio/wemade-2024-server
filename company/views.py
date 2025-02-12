@@ -20,9 +20,11 @@ class CorpListAPIView(ListAPIView):
 
 class CorpDetailAPIView(RetrieveAPIView):
     serializer_class = CorpDetailSerializer
+    queryset = Corporation.objects.all()
+    lookup_field = 'c_id'
 
     def retrieve(self, request, *args, **kwargs):
-        corporation = get_object_or_404(Corporation, c_id=kwargs.get('c_id'))  # ✅ `p_id` → `c_id`
+        corporation = get_object_or_404(Corporation, c_id=kwargs.get('c_id'))
         return Response(self.get_serializer(corporation).data, status=200)
 
 
@@ -38,9 +40,11 @@ class CorpCreateAPIView(CreateAPIView):
 
 class CorpUpdateDeleteAPIView(RetrieveUpdateDestroyAPIView):
     serializer_class = CorpUpdateDeleteSerializer
+    queryset = Corporation.objects.all()
+    lookup_field = 'c_id'
 
     def retrieve(self, request, *args, **kwargs):
-        corporation = get_object_or_404(Corporation, p_id=kwargs.get('c_id'))
+        corporation = get_object_or_404(Corporation, c_id=kwargs.get('c_id'))
         return Response(self.get_serializer(corporation).data, status=200)
 
     def update(self, request, *args, **kwargs):
@@ -71,6 +75,8 @@ class TeamListAPIView(ListAPIView):
 
 class TeamDetailAPIView(RetrieveAPIView):
     serializer_class = TeamDetailSerializer
+    queryset = Team.objects.all()
+    lookup_field = 't_id'
 
     def retrieve(self, request, *args, **kwargs):
         team = get_object_or_404(Team, t_id=kwargs.get('t_id'))
@@ -89,9 +95,11 @@ class TeamCreateAPIView(CreateAPIView):
 
 class TeamUpdateDeleteAPIView(RetrieveUpdateDestroyAPIView):
     serializer_class = TeamUpdateDeleteSerializer
+    queryset = Team.objects.all()
+    lookup_field = 't_id'
 
     def retrieve(self, request, *args, **kwargs):
-        team = get_object_or_404(Team, p_id=kwargs.get('t_id'))
+        team = get_object_or_404(Team, t_id=kwargs.get('t_id'))
         return Response(self.get_serializer(team).data, status=200)
 
     def update(self, request, *args, **kwargs):
