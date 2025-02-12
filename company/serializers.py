@@ -44,7 +44,7 @@ class TeamListSerializer(serializers.ModelSerializer):
 
 class TeamDetailSerializer(serializers.ModelSerializer):
     corporation = CorpDetailSerializer()
-    sub_teams = serializers.PrimaryKeyRelatedField(many=True, queryset=Team.objects.all(), source='super_teams')
+    sub_teams = serializers.PrimaryKeyRelatedField(many=True, queryset=Team.objects.all(), source='lower_teams')
     parent_teams = serializers.SerializerMethodField()
     members = serializers.PrimaryKeyRelatedField(many=True, queryset=Person.objects.all())
     team_leader = serializers.PrimaryKeyRelatedField(queryset=Person.objects.all())
@@ -58,8 +58,8 @@ class TeamDetailSerializer(serializers.ModelSerializer):
         parent_teams = []
         current_team = obj
         order = 0
-        while current_team.lower_teams.exists():
-            parent_team = current_team.lower_teams.first()
+        while current_team.parent_teams.exists():
+            parent_team = current_team.parent_teams.first()
             parent_teams.append({'t_id': parent_team.t_id, 'name': parent_team.name, 'order': order})
             current_team = parent_team
             order += 1  # 상위조직일수록 order가 크게
