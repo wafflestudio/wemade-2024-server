@@ -65,7 +65,8 @@ INSTALLED_APPS = [
     "person",
     "company",
     "personCard",
-    "files"
+    "files",
+    "master",
 ]
 
 MIDDLEWARE = [
