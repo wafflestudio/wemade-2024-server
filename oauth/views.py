@@ -69,6 +69,7 @@ class GoogleLoginCallback(APIView):
 
         try:
             user = OauthInfo.objects.get(username=sub)
+            person = user.person
         except OauthInfo.DoesNotExist:
             personal_info = PersonalInfo.objects.filter(emails__contains=[email]).first()
             if not personal_info:
@@ -87,9 +88,11 @@ class GoogleLoginCallback(APIView):
             {
                 "access_token": access_token,
                 "refresh_token": str(refresh),
+                "roles": person.roles, # 내부 구조: {{"t_id": "", "role": "부서원"}, {"t_id": "", "role":""},...}
             },
             status=status.HTTP_200_OK,
         )
+
 
 class TestPage(APIView):
     permission_classes = [IsAuthenticated]

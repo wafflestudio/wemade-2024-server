@@ -6,7 +6,7 @@ from .serializers import *
 from .paginations import *
 
 
-class PersonCardListAPI(ListCreateAPIView):
+class PersonCardListAPIView(ListCreateAPIView):
     serializer_class = PersonCardListSerializer
     pagination_class = PersonCardListPagination
 
@@ -25,7 +25,7 @@ class PersonCardSearchListAPIView(ListAPIView):
         return Person.objects.filter(name__icontains=name)
 
 
-class PersonCardListDetailAPI(RetrieveAPIView):
+class PersonCardListDetailAPIView(RetrieveAPIView):
     serializer_class = PersonCardListDetailSerializer
 
     def retrieve(self, request, *args, **kwargs):
@@ -33,7 +33,7 @@ class PersonCardListDetailAPI(RetrieveAPIView):
         return Response(self.get_serializer(person).data, status=200)
 
 
-class PersonCardDetailAPI(RetrieveAPIView):
+class PersonCardDetailAPIView(RetrieveAPIView):
     serializer_class = PersonCardDetailSerializer
 
     def retrieve(self, request, *args, **kwargs):
@@ -41,7 +41,7 @@ class PersonCardDetailAPI(RetrieveAPIView):
         return Response(self.get_serializer(person).data, status=200)
 
 
-class PersonCardUpdateAPI(RetrieveUpdateDestroyAPIView):
+class PersonCardUpdateAPIView(RetrieveUpdateDestroyAPIView):
     serializer_class = PersonCardUpdateSerializer
     queryset = PersonalInfo.objects.all()
     lookup_field = 'person__p_id'
