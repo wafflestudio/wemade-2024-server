@@ -1,6 +1,6 @@
 from django.db import models
 from person.models import *
-from company.models import * #company branch와 병합 후 주석 해제
+from company.models import *
 
 
 # p_info: 공개정보(자격증 등), p_card_info(비공개/인사카드 정보)

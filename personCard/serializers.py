@@ -51,15 +51,32 @@ class PersonCardDetailSerializer(serializers.ModelSerializer):
         return []
 
 
+
 class PersonalInfoUpdateSerializer(serializers.ModelSerializer):
     phone_number = serializers.CharField(source='main_phone_number', required=False, allow_null=True)
-    info = serializers.JSONField(source='p_info', required=False, allow_null=True)
     emails = serializers.SerializerMethodField()
-    p_card_info = serializers.JSONField(source='p_card_info.p_card_info', required=False, allow_null=True)
+
+    validate_public_info = PersonCardInfoValidator(expected_public=True)
+    validate_private_info = PersonCardInfoValidator(expected_public=False)
+
+    # 공개 정보는 p_info JSON에 저장
+    p_info = serializers.JSONField(
+        source='p_info',
+        required=False,
+        allow_null=True,
+        validators=[validate_public_info]
+    )
+    # 비공개 정보는 p_card_info JSON에 저장
+    p_card_info = serializers.JSONField(
+        source='p_card_info.p_card_info',
+        required=False,
+        allow_null=True,
+        validators=[validate_private_info]
+    )
 
     class Meta:
         model = PersonalInfo
-        fields = ['name', 'phone_number', 'info', 'emails', 'p_card_info']
+        fields = ['name', 'phone_number', 'p_info', 'emails', 'p_card_info']
 
     def get_emails(self, obj):
         if obj and isinstance(obj.emails, list):
