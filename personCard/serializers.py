@@ -154,3 +154,17 @@ class PersonRolesUpdateSerializer(serializers.ModelSerializer):
                     )
 
         return instance
+
+
+class PersonalHistorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PersonalHistory
+        fields = ['id', 'start_date', 'end_date', 'team', 'role', 'supervisor', 'job_description']
+
+
+# 직무 설명(job_description) 업데이트만을 위한 serializer
+class PersonalHistoryUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PersonalHistory
+        fields = ['job_description']
+
