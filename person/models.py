@@ -51,6 +51,7 @@ class PersonalHistory(models.Model):
     team = models.ForeignKey('company.Team', on_delete=models.SET_NULL, null=True)
     role = models.CharField(max_length=20)  # 한 팀에서는 role이 하나라고 가정
     supervisor = models.IntegerField()  # 해당 시기 team의 team_leader(p_id)
+    job_description = models.TextField(null=True)
 
     class Meta:
         db_table = 'personal_history'
