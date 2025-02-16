@@ -11,7 +11,7 @@ urlpatterns = [
     # 사람 이름을 query로 받아 검색하기
     path('search/',  PersonCardSearchListAPIView.as_view(), name='person-card-search'),
 
-    # 인사정보 업데이트
+    # 개인정보 업데이트
     path('<int:p_id>/info/update/', PersonalInfoUpdateAPIView.as_view(), name='personal-info-update'),
     # 직무 업데이트 (HR Team) + 직무 히스토리 생성
     path('<int:p_id/roles/update/>', PersonRolesUpdateAPIView.as_view(), name='person-roles-update'),
