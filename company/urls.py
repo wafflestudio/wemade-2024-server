@@ -4,16 +4,26 @@ from .views import *
 
 urlpatterns = [
     # Corporation
-    path('corp/list/', CorpListAPIView.as_view(), name='corp-list'),  # list all corporations
-    path('corp/<int:c_id>/update/', CorpUpdateDeleteAPIView.as_view(), name='corp-update'),  # update corporation info
-    path('corp/<int:c_id>/delete/', CorpUpdateDeleteAPIView.as_view(), name='corp-delete'),  # delete corporation info
-    path('corp/<int:c_id>/', CorpDetailAPIView.as_view(), name='corp-detail'),  # get specific corporation info
-    path('corp/create/', CorpCreateAPIView.as_view(), name='corp-create'),  # create new corporation
+    # 새로운 Corporation 생성
+    path('corp/create/', CorpCreateAPIView.as_view(), name='corp-create'),
+    # 모든 Corporation List
+    path('corp/list/', CorpListAPIView.as_view(), name='corp-list'),
+    # Corporation 정보 업데이트 (Master)
+    path('corp/<int:c_id>/update/', CorpUpdateDeleteAPIView.as_view(), name='corp-update'),
+    # Corporation 정보 삭제 (Master)
+    path('corp/<int:c_id>/delete/', CorpUpdateDeleteAPIView.as_view(), name='corp-delete'),
+    # 특정 Corporation의 정보 조회
+    path('corp/<int:c_id>/', CorpDetailAPIView.as_view(), name='corp-detail'),
 
     # Team
-    path('team/list/', TeamListAPIView.as_view(), name='team-list'),  # list all teams
-    path('team/<int:t_id>/update/', TeamUpdateDeleteAPIView.as_view(), name='team-update'),  # update team info
-    path('team/<int:t_id>/delete/', TeamUpdateDeleteAPIView.as_view(), name='team-delete'),  # delete team info
-    path('team/<int:t_id>/', TeamDetailAPIView.as_view(), name='team-detail'),  # get specific team info
-    path('team/create/', TeamCreateAPIView.as_view(), name='team-create'),  # create new team
+    # 새로운 Team 생성
+    path('team/create/', TeamCreateAPIView.as_view(), name='team-create'),
+    # 모든 Team List
+    path('team/list/', TeamListAPIView.as_view(), name='team-list'),
+    # Team 정보 업데이트 (Master/HR Team)
+    path('team/<int:t_id>/update/', TeamUpdateDeleteAPIView.as_view(), name='team-update'),
+    # Team 정보 삭제 (Master/HR Team)
+    path('team/<int:t_id>/delete/', TeamUpdateDeleteAPIView.as_view(), name='team-delete'),
+    # 특정 Team의 정보 조회
+    path('team/<int:t_id>/', TeamDetailAPIView.as_view(), name='team-detail'),
 ]
