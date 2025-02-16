@@ -14,20 +14,10 @@ from .permissions import *
 
 
 # 검색 페이지에서 모든 사람 정보 불러오기
-class PersonCardListAPIView(ListCreateAPIView):
+class PersonCardListAPIView(ListAPIView):
     serializer_class = PersonCardListSerializer
     pagination_class = PersonCardListPagination
     permission_classes = [AllowAny]
-
-    def get_queryset(self):
-        return Person.objects.all()
-
-
-# 사람 이름을 query로 받아 검색하기
-class PersonCardSearchListAPIView(ListAPIView):
-    serializer_class = PersonCardListSerializer
-    pagination_class = PersonCardListPagination
-    permission_classes =  [AllowAny]
 
     def get_queryset(self):
         name = self.request.query_params.get('name')
@@ -46,6 +36,17 @@ class PersonCardListDetailAPIView(RetrieveAPIView):
         return Response(self.get_serializer(person).data, status=200)
 
 
+# 인사카드 조회
+class PersonCardDetailAPIView(RetrieveAPIView):
+    serializer_class = PersonCardDetailSerializer
+    permission_classes = [IsOwnerOrHRTeamOrTeamLeader]
+
+    def retrieve(self, request, *args, **kwargs):
+        person = get_object_or_404(Person, p_id=kwargs.get('p_id'))
+        self.check_object_permissions(request, person)
+        return Response(self.get_serializer(person).data, status=200)
+
+
 # 개인정보 업데이트
 class PersonalInfoUpdateAPIView(RetrieveUpdateDestroyAPIView):
     queryset = PersonalInfo.objects.all()
@@ -61,17 +62,6 @@ class PersonRolesUpdateAPIView(RetrieveUpdateAPIView):
     serializer_class = PersonRolesUpdateSerializer
     lookup_field = 'p_id'  # URL에서 p_id를 사용해 Person을 조회
     permission_classes = [IsHRTeam]
-
-
-# 인사카드 조회
-class PersonCardDetailAPIView(RetrieveAPIView):
-    serializer_class = PersonCardDetailSerializer
-    permission_classes = [IsOwnerOrHRTeamOrTeamLeader]
-
-    def retrieve(self, request, *args, **kwargs):
-        person = get_object_or_404(Person, p_id=kwargs.get('p_id'))
-        self.check_object_permissions(request, person)
-        return Response(self.get_serializer(person).data, status=200)
 
 
 # 직무 히스토리 정보 불러오기

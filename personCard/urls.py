@@ -8,8 +8,6 @@ urlpatterns = [
     path('list/<int:p_id>/', PersonCardListDetailAPIView.as_view(), name='person-card-list-detail'),
     # 검색 페이지에서 모든 사람 정보 불러오기
     path('list/', PersonCardListAPIView.as_view(), name='person-card-list'),
-    # 사람 이름을 query로 받아 검색하기
-    path('search/',  PersonCardSearchListAPIView.as_view(), name='person-card-search'),
 
     # 개인정보 업데이트 (본인/Master/HR Team)
     path('<int:p_id>/info/update/', PersonalInfoUpdateAPIView.as_view(), name='personal-info-update'),
