@@ -327,3 +327,7 @@ class GetTeamOfCommitView(APIView):
         response_data.update({"sub_teams": children})
         return Response(response_data, status=200)
 
+class CommitListAPIView(ListAPIView):
+    serializer_class = CommitListSerializer
+    pagination_class = CommitListPagination
+    queryset = Commit.objects.all()

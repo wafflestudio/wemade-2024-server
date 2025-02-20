@@ -20,4 +20,7 @@ urlpatterns = [
     #path('team/create/', TeamCreateAPIView.as_view(), name='team-create'),  # create new team
     path('team/commit/', TeamBatchProcessView.as_view(), name='team-commit'), # use commit for create/delete/update team
     path('team/<int:t_id>/old/', GetTeamOfCommitView.as_view(), name='team-of-commit'),
+
+    # Commit
+    path('commit/list/', CommitListAPIView.as_view(), name='commit-list'),  # list all commits
 ]

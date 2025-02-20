@@ -82,3 +82,8 @@ class TeamUpdateDeleteSerializer(serializers.ModelSerializer):
         model = Team
         fields = ['t_id', 'name', 'corporation', 'sub_teams', 'parent_teams', 'members', 'team_leader']
         read_only_fields = ['t_id']
+
+class CommitListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Commit
+        fields = ['commit_id', 'commit_message', 'commit_date', 'commit_author', 'commit_content']
