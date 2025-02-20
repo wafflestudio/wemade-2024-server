@@ -277,7 +277,7 @@ class CorpBatchProcessView(APIView):
             except Exception as e:
                 errors.append({"item": item, "error": str(e)})
 
-        return Response({"results": results, "errors": errors}, status=200)
+        return Response({"results": results, "errors": errors, "commit_id": new_commit.commit_id}, status=200)
 
 class GetCorpOfCommitView(APIView):
     def get(self, request, *args, **kwargs):
