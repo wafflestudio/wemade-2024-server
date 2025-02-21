@@ -10,7 +10,6 @@ from rest_framework.exceptions import ValidationError
 from .serializers import *
 from .paginations import *
 from rest_framework import status
-from django.db.models import OuterRef, Subquery
 import logging
 
 logger = logging.getLogger(__name__)
@@ -305,27 +304,64 @@ class GetCorpOfCommitView(APIView):
 
 class GetTeamOfCommitView(APIView):
     def get(self, request, *args, **kwargs):
-        target_team_id = kwargs.get('t_id')
-        target_commit_id = request.query_params.get('commit')
+        target_team_id = int(kwargs.get('t_id'))
+        target_commit_id = int(request.query_params.get('commit'))
+
         teams = Team.objects.all()
         children = []
 
         for sub_team_candidate in teams:
-            for d in sub_team_candidate.parent_team_history[::-1]:
-                if d.get('commit_id') <= int(target_commit_id):
-                    if  d.get('parent_id') == int(target_team_id):
-                        children.append(sub_team_candidate.t_id)
-                    break
+            relevant_parent = next(
+                (entry for entry in reversed(sub_team_candidate.parent_team_history)
+                 if entry['commit_id'] <= target_commit_id),
+                None
+            )
+            if relevant_parent and relevant_parent['parent_id'] == target_team_id:
+                children.append(sub_team_candidate.t_id)
 
         team = Team.objects.get(t_id=target_team_id)
         serializer = TeamDetailSerializer(team)
         response_data = serializer.data.copy()
 
-        for n in team.name_history:
-            if n.get('commit_id') <= int(target_commit_id):
-                response_data.update({"name": n.get('name')})
-        response_data.update({"sub_teams": children})
+        latest_name = next(
+            (entry for entry in reversed(team.name_history) if entry['commit_id'] <= target_commit_id),
+            None
+        )
+        if latest_name:
+            response_data['name'] = latest_name['name']
+
+        response_data['sub_teams'] = children
+
+        def fetch_parents(target_team, commit_id=target_commit_id):
+            parent_teams = []
+            current_team = target_team
+            while True:
+                parent_id = next(
+                    (entry for entry in reversed(current_team.parent_team_history)
+                     if entry['commit_id'] <= commit_id),
+                    None
+                )
+                if parent_id == "" or parent_id is None: break
+
+                parent_team = Team.objects.get(t_id=parent_id['parent_id'])
+                parent_teams.append({
+                    't_id': parent_team.t_id,
+                    'name': next(
+                        (entry for entry in reversed(parent_team.name_history) if entry['commit_id'] <= commit_id),
+                        None
+                    )['name'] if parent_team.name_history else parent_team.name,
+                    'order': len(parent_teams),
+                })
+                current_team = parent_team
+
+            return parent_teams
+
+        response_data['parent_teams'] = fetch_parents(team, target_commit_id)
+
         return Response(response_data, status=200)
+
+
+
 
 class CommitListAPIView(ListAPIView):
     serializer_class = CommitListSerializer
