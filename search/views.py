@@ -57,7 +57,7 @@ class PersonSearchAPIView(APIView):
         if query:
             persons = persons.filter(name__icontains=query)
         if certificate:
-            persons = persons.filter(certificates__name__icontains=certificate)
+            persons = persons.filter(personal_info__p_info__certificates__icontains=certificate)
         if filter_corp:
             persons = persons.filter(member_of_teams__corporation__c_id=filter_corp)
         if filter_team:

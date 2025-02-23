@@ -16,7 +16,7 @@ class PersonalInfo(models.Model):
     name = models.CharField(max_length=100, null=True)
     emails = models.JSONField()
     birthday = models.TextField(max_length=10, null=True) # 2000-01-01 형태
-    p_info = models.JSONField(null=True, blank=True)  # 공개 정보
+    p_info = models.JSONField(null=True, blank=True)  # 공개 정보 : certificates 정보 있다고 생각
     p_card_info = models.OneToOneField(PersonCardInfo, on_delete=models.CASCADE, null=True) # 비공개 정보
 
     class Meta:
