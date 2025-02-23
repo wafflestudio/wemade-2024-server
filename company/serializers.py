@@ -130,8 +130,8 @@ class TeamUpdateDeleteSerializer(serializers.ModelSerializer):
         ]
 
     def update(self, instance, validated_data):
-        # ManyToMany 필드 분리
-        parent_teams = validated_data.pop('parent_teams', None)
+        # ManyToMany 필드 분리: parent_teams, sub_teams, members
+        parent_teams_data = validated_data.pop('parent_teams', None)
         sub_teams = validated_data.pop('sub_teams', None)
         members = validated_data.pop('members', None)
 
@@ -140,16 +140,25 @@ class TeamUpdateDeleteSerializer(serializers.ModelSerializer):
             setattr(instance, attr, value)
         instance.save()
 
-        # ManyToMany 필드 업데이트: 값이 전달된 경우에만 처리
-        if parent_teams is not None:
-            instance.parent_teams.set(parent_teams)
-            # parent_teams가 빈 리스트면 corporation의 sub_teams에 추가
-            if len(parent_teams) == 0 and instance.corporation:
+        # parent_teams 업데이트
+        if parent_teams_data is not None:
+            # 전달된 값이 [{'t_id': ..., 'name': ..., 'order': ...}, ...] 형태
+            if parent_teams_data and isinstance(parent_teams_data[0], dict):
+                filtered_parent_ids = [d['t_id'] for d in parent_teams_data if d.get('order') == 0]
+            else:
+                filtered_parent_ids = parent_teams_data
+
+            instance.parent_teams.set(filtered_parent_ids)
+
+            # parent_teams가 빈 리스트이면 corporation의 sub_teams에 추가
+            if len(filtered_parent_ids) == 0 and instance.corporation:
                 instance.corporation.sub_teams.add(instance)
+
         if sub_teams is not None:
             instance.sub_teams.set(sub_teams)
         if members is not None:
             instance.members.set(members)
 
         return instance
+
 
