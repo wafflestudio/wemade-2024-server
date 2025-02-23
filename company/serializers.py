@@ -11,10 +11,8 @@ class CorpListSerializer(serializers.ModelSerializer):
 
 
 class CorpDetailSerializer(serializers.ModelSerializer):
-    sub_teams = serializers.PrimaryKeyRelatedField(
-        many=True,
-        queryset=Team.objects.all()
-    )
+    sub_teams = TeamListSerializer(many=True, read_only=True, source='corporation_sub_teams')
+    hr_team = TeamListSerializer(read_only=True, source='corporation_hr_team')
 
     class Meta:
         model = Corporation
@@ -31,6 +29,27 @@ class CorpUpdateDeleteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Corporation
         fields = ['name', 'sub_teams', 'is_active']
+
+    def update(self, instance, validated_data):
+        # ManyToMany 필드 분리
+        sub_teams = validated_data.pop('sub_teams', None)
+
+        # 일반 필드 업데이트
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        # is_active가 False이고 deleted_at이 아직 설정되지 않았다면, 현재 시간으로 설정
+        if 'is_active' in validated_data and not validated_data.get('is_active'):
+            if not instance.deleted_at:
+                instance.deleted_at = timezone.now()
+
+        instance.save()
+
+        # sub_teams 업데이트: 값이 전달된 경우에만 처리
+        if sub_teams is not None:
+            instance.sub_teams.set(sub_teams)
+
+        return instance
 
 
 # Team Serializers
