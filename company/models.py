@@ -9,7 +9,9 @@ class Corporation(models.Model):
     sub_teams = models.ManyToManyField('company.Team', related_name='corporation_sub_teams', blank=True)
     hr_team = models.ForeignKey('company.Team', related_name='corporation_hr_team', on_delete=models.SET_NULL, null=True)
 
-    #hr_team_members = models.ManyToManyField('person.Person', related_name='hr_team_members', blank=True)
+    # 생성일과 삭제일 추가
+    created_at = models.DateTimeField(auto_now_add=True)
+    deleted_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         db_table = 'corporation'
@@ -28,6 +30,10 @@ class Team(models.Model):
     # 문자열 참조 사용
     members = models.ManyToManyField('person.Person', related_name='member_of_teams', blank=True)
     team_leader = models.ForeignKey('person.Person', related_name='leading_teams', on_delete=models.SET_NULL, null=True, blank=True)
+
+    # 생성일과 삭제일 추가
+    created_at = models.DateTimeField(auto_now_add=True)
+    deleted_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         db_table = 'team'

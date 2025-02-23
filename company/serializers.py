@@ -1,4 +1,4 @@
-# serializers.py
+from django.utils import timezone
 from rest_framework import serializers
 from .models import Corporation, Team
 from person.models import Person
@@ -64,7 +64,7 @@ class TeamDetailSerializer(serializers.ModelSerializer):
         model = Team
         fields = [
             't_id', 'name', 'corporation', 'sub_teams',
-            'parent_teams', 'team_leader', 'members', 'member_count', 'is_active'
+            'parent_teams', 'team_leader', 'members', 'member_count', 'is_active', 'created_at', 'deleted_at'
         ]
 
     def get_parent_teams(self, obj):
@@ -100,6 +100,15 @@ class TeamCreateSerializer(serializers.ModelSerializer):
         sub_teams = validated_data.pop('sub_teams', [])
         members = validated_data.pop('members', [])
 
+        # 같은 corporation에 속한 활성 팀 중 동일한 이름이 존재하는지 확인
+        corporation = validated_data.get('corporation')
+        name = validated_data.get('name')
+        if corporation and Team.objects.filter(corporation=corporation, name=name, is_active=True).exists():
+            raise serializers.ValidationError("같은 corporation 내에 활성 상태의 동일한 이름의 팀이 이미 존재합니다.")
+
+        # 팀 생성일 자동 저장 (Team 모델에 created_at 필드가 있다고 가정)
+        validated_data['created_at'] = timezone.now()
+
         # 팀 생성
         team = Team.objects.create(**validated_data)
 
@@ -108,11 +117,9 @@ class TeamCreateSerializer(serializers.ModelSerializer):
         team.sub_teams.set(sub_teams)
         team.members.set(members)
 
-        # parent_teams가 빈 리스트이면, 자동으로 해당 Team을 corporation의 sub_teams에 추가
-        if not parent_teams:
-            corporation = validated_data.get('corporation')
-            if corporation:
-                corporation.sub_teams.add(team)
+        # parent_teams가 빈 리스트이면, 자동으로 해당 팀을 corporation의 sub_teams에 추가
+        if not parent_teams and corporation:
+            corporation.sub_teams.add(team)
 
         return team
 
@@ -134,6 +141,14 @@ class TeamUpdateDeleteSerializer(serializers.ModelSerializer):
         # 일반 필드 업데이트
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
+        instance.save()
+
+        # deleted_at 필드 업데이트
+        if 'is_active' in validated_data and not validated_data.get('is_active'):
+            if not instance.deleted_at:
+                instance.deleted_at = timezone.now()
+            instance.is_active = False
+
         instance.save()
 
         # parent_teams 업데이트
