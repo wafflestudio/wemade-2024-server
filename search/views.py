@@ -10,6 +10,15 @@ from company.models import Team, Corporation
 from personCard.serializers import PersonCardListSerializer
 from company.serializers import CorpListSerializer, TeamListSerializer
 
+from django.db.models import F, Value, Func, CharField
+
+
+class RemoveSpaces(Func):
+    function = 'REPLACE'
+    template = "%(function)s(%(expressions)s, ' ', '')"
+    output_field = CharField()
+
+
 
 # class SearchListAPIView(APIView):
 #     """
@@ -43,6 +52,7 @@ from company.serializers import CorpListSerializer, TeamListSerializer
 #         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+
 # Person의 소속 법인/팀, 자격증으로 검색
 class PersonSearchAPIView(APIView):
     permission_classes = [AllowAny]
@@ -56,9 +66,17 @@ class PersonSearchAPIView(APIView):
         persons = Person.objects.all().order_by('name')
 
         if query:
-            persons = persons.filter(name__icontains=query)
+            # 입력된 검색어의 띄어쓰기를 제거
+            query_clean = query.replace(' ', '')
+            # name 필드에서 띄어쓰기를 제거한 값을 clean_name으로 주석 처리 후 필터링
+            persons = persons.annotate(
+                clean_name=RemoveSpaces(F('name'))
+            ).filter(clean_name__icontains=query_clean)
         if certificate:
-            persons = persons.filter(personal_info__p_info__certificates__icontains=certificate)
+            cert_clean = certificate.replace(' ', '')
+            persons = persons.annotate(
+                cert_no_space=RemoveSpaces(F('personal_info__p_info__certificates'))
+            ).filter(cert_no_space__icontains=cert_clean)
         if filter_corp:
             persons = persons.filter(member_of_teams__corporation__c_id=filter_corp)
         if filter_team:
@@ -66,6 +84,7 @@ class PersonSearchAPIView(APIView):
         persons = persons.distinct()
         serializer = PersonCardListSerializer(persons, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 
 # Team 이름으로 Team 검색
@@ -76,7 +95,8 @@ class TeamSearchAPIView(APIView):
         query = request.query_params.get('q', '')
         teams = Team.objects.all().order_by('name')
         if query:
-            teams = teams.filter(name__icontains=query)
+            query_clean = query.replace(' ', '')
+            teams = teams.annotate(clean_name=RemoveSpaces(F('name'))).filter(clean_name__icontains=query_clean)
         serializer = TeamListSerializer(teams, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -89,7 +109,8 @@ class CorpSearchAPIView(APIView):
         query = request.query_params.get('q', '')
         corps = Corporation.objects.all().order_by('name')
         if query:
-            corps = corps.filter(name__icontains=query)
+            query_clean = query.replace(' ', '')
+            corps = corps.annotate(clean_name=RemoveSpaces(F('name'))).filter(clean_name__icontains=query_clean)
         serializer = CorpListSerializer(corps, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
