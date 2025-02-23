@@ -4,7 +4,8 @@ from django.db import models
 class Corporation(models.Model):
     c_id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=255)
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=True)  # 현재 존재하는 법인 여부
+    is_master = models.BooleanField(default=False)  # 본사 여부
 
     sub_teams = models.ManyToManyField('company.Team', related_name='corporation_sub_teams', blank=True)
     hr_team = models.ForeignKey('company.Team', related_name='corporation_hr_team', on_delete=models.SET_NULL, null=True)

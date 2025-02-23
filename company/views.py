@@ -18,7 +18,7 @@ from .permissions import *
 # 새로운 Corporation 생성
 class CorpCreateAPIView(CreateAPIView):
     serializer_class = CorpCreateSerializer
-    #permission_class = [IsMaster]
+    permission_class = [IsMasterHRTeam]
 
 
 # 모든 Corporation List
@@ -40,7 +40,7 @@ class CorpUpdateDeleteAPIView(RetrieveUpdateDestroyAPIView):
     queryset = Corporation.objects.all()
     lookup_field = 'c_id'
     lookup_url_kwarg = 'c_id'
-    #permission_classes = [IsMaster]
+    permission_classes = [IsMasterHRTeam]
 
 
 # 특정 Corporation의 정보 조회
@@ -57,7 +57,7 @@ class CorpDetailAPIView(RetrieveAPIView):
 # 새로운 Team 생성
 class TeamCreateAPIView(CreateAPIView):
     serializer_class = TeamCreateSerializer
-    permission_classes = [IsHRTeam]
+    permission_classes = [OR(IsMasterHRTeam, IsHRTeam)]
 
 
 # 모든 Team List
@@ -79,7 +79,7 @@ class TeamUpdateDeleteAPIView(RetrieveUpdateDestroyAPIView):
     queryset = Team.objects.all()
     lookup_field = 't_id'
     lookup_url_kwarg = 't_id'
-    permission_classes = [IsHRTeam]
+    permission_classes = [OR(IsMasterHRTeam, IsHRTeam)]
 
 # 특정 Team의 정보 조회
 class TeamDetailAPIView(RetrieveAPIView):
