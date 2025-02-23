@@ -47,12 +47,9 @@ class TeamListSerializer(serializers.ModelSerializer):
 
 class TeamDetailSerializer(serializers.ModelSerializer):
     corporation = CorpDetailSerializer(read_only=True)
-    # 하위 조직은 parent_teams의 역참조인 lower_teams를 사용하여 표현
-    sub_teams = serializers.PrimaryKeyRelatedField(
-        many=True,
-        queryset=Team.objects.all(),
-        source='lower_teams'
-    )
+    # 하위 조직은 역참조인 lower_teams를 TeamListSerializer로 표시
+    sub_teams = TeamListSerializer(many=True, read_only=True, source='lower_teams')
+    # 상위 조직은 커스텀 메서드로 부모 체인을 구성하여 상세 정보와 order 값을 함께 반환
     parent_teams = serializers.SerializerMethodField()
     members = serializers.PrimaryKeyRelatedField(
         many=True,
@@ -71,20 +68,19 @@ class TeamDetailSerializer(serializers.ModelSerializer):
         ]
 
     def get_parent_teams(self, obj):
-        # 상위 조직 정보를 order와 함께 반환 (최상위까지)
-        parent_teams = []
+        parent_chain = []
         current_team = obj
         order = 0
+        # 현재 팀의 상위 체인을 모두 추적 (최상위까지)
         while current_team.parent_teams.exists():
             parent_team = current_team.parent_teams.first()
-            parent_teams.append({
-                't_id': parent_team.t_id,
-                'name': parent_team.name,
-                'order': order
-            })
+            # TeamListSerializer를 통해 상세 정보를 가져오고, order 값을 추가
+            serialized = TeamListSerializer(parent_team, context=self.context).data
+            serialized['order'] = order
+            parent_chain.append(serialized)
             current_team = parent_team
             order += 1
-        return parent_teams
+        return parent_chain
 
     def get_member_count(self, obj):
         return obj.members.count()
