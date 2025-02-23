@@ -119,11 +119,11 @@ class TeamCreateSerializer(serializers.ModelSerializer):
         sub_teams = validated_data.pop('sub_teams', [])
         members = validated_data.pop('members', [])
 
-        # 같은 corporation에 속한 활성 팀 중 동일한 이름이 존재하는지 확인
-        corporation = validated_data.get('corporation')
-        name = validated_data.get('name')
-        if corporation and Team.objects.filter(corporation=corporation, name=name, is_active=True).exists():
-            raise serializers.ValidationError("같은 corporation 내에 활성 상태의 동일한 이름의 팀이 이미 존재합니다.")
+        # # 같은 corporation에 속한 활성 팀 중 동일한 이름이 존재하는지 확인
+        # corporation = validated_data.get('corporation')
+        # name = validated_data.get('name')
+        # if corporation and Team.objects.filter(corporation=corporation, name=name, is_active=True).exists():
+        #     raise serializers.ValidationError("같은 corporation 내에 활성 상태의 동일한 이름의 팀이 이미 존재합니다.")
 
         # 팀 생성일 자동 저장 (Team 모델에 created_at 필드가 있다고 가정)
         validated_data['created_at'] = timezone.now()
