@@ -98,6 +98,28 @@ class TeamCreateSerializer(serializers.ModelSerializer):
             'parent_teams', 'members', 'team_leader', 'is_active'
         ]
 
+    def create(self, validated_data):
+        # ManyToManyField 분리
+        parent_teams = validated_data.pop('parent_teams', [])
+        sub_teams = validated_data.pop('sub_teams', [])
+        members = validated_data.pop('members', [])
+
+        # 팀 생성
+        team = Team.objects.create(**validated_data)
+
+        # ManyToMany 필드 설정
+        team.parent_teams.set(parent_teams)
+        team.sub_teams.set(sub_teams)
+        team.members.set(members)
+
+        # parent_teams가 빈 리스트이면, 자동으로 해당 Team을 corporation의 sub_teams에 추가
+        if not parent_teams:
+            corporation = validated_data.get('corporation')
+            if corporation:
+                corporation.sub_teams.add(team)
+
+        return team
+
 
 class TeamUpdateDeleteSerializer(serializers.ModelSerializer):
     class Meta:
@@ -106,3 +128,28 @@ class TeamUpdateDeleteSerializer(serializers.ModelSerializer):
             'name', 'corporation', 'sub_teams',
             'parent_teams', 'members', 'team_leader', 'is_active'
         ]
+
+    def update(self, instance, validated_data):
+        # ManyToMany 필드 분리
+        parent_teams = validated_data.pop('parent_teams', None)
+        sub_teams = validated_data.pop('sub_teams', None)
+        members = validated_data.pop('members', None)
+
+        # 일반 필드 업데이트
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+
+        # ManyToMany 필드 업데이트: 값이 전달된 경우에만 처리
+        if parent_teams is not None:
+            instance.parent_teams.set(parent_teams)
+            # parent_teams가 빈 리스트면 corporation의 sub_teams에 추가
+            if len(parent_teams) == 0 and instance.corporation:
+                instance.corporation.sub_teams.add(instance)
+        if sub_teams is not None:
+            instance.sub_teams.set(sub_teams)
+        if members is not None:
+            instance.members.set(members)
+
+        return instance
+
