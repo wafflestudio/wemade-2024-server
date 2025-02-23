@@ -188,3 +188,14 @@ class TeamUpdateDeleteSerializer(serializers.ModelSerializer):
         return instance
 
 
+class RoleSerializer(serializers.ModelSerializer):
+    team = serializers.CharField(source='team.name', read_only=True)
+    supervisor = serializers.CharField(source='supervisor.name', read_only=True)
+
+    class Meta:
+        model = Role
+        fields = ['r_id', 'team', 'role_name', 'supervisor', 'isHR']
+
+#class RoleDetailSerializer(serializers.ModelSerializer):
+
+

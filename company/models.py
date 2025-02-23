@@ -38,3 +38,47 @@ class Team(models.Model):
 
     class Meta:
         db_table = 'team'
+
+
+class Role(models.Model):
+    r_id = models.BigAutoField(primary_key=True)
+    person = models.ForeignKey('person.Person', on_delete=models.CASCADE, related_name='roles')
+    team = models.ForeignKey('company.Team', on_delete=models.SET_NULL, null=True, blank=True, related_name='roles')
+    supervisor = models.ForeignKey('person.Person', on_delete=models.SET_NULL, null=True, blank=True, related_name='supervised_roles')
+    role_name = models.CharField(max_length=50, null=True, blank=True)
+    start_date = models.DateTimeField(null=True, blank=True)
+    end_date = models.DateTimeField(null=True, blank=True)
+    job_description = models.TextField(null=True, blank=True)
+    is_HR = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = 'role'
+
+    def __str__(self):
+        return f"{self.person.name} - {self.role_name}"
+
+    def update_supervisor(self, new_supervisor):
+        # 만약 supervisor가 변경된다면, 히스토리 기록을 남깁니다.
+        if self.supervisor != new_supervisor:
+            RoleSupervisorHistory.objects.create(
+                role=self,
+                old_supervisor=self.supervisor,
+                new_supervisor=new_supervisor,
+                changed_at=timezone.now()
+            )
+            self.supervisor = new_supervisor
+            self.save()
+
+
+class RoleSupervisorHistory(models.Model):
+    role = models.ForeignKey(Role, on_delete=models.CASCADE, related_name='supervisor_history')
+    old_supervisor = models.ForeignKey('person.Person', on_delete=models.SET_NULL, null=True, blank=True, related_name='old_supervisor_roles')
+    new_supervisor = models.ForeignKey('person.Person', on_delete=models.SET_NULL, null=True, blank=True, related_name='new_supervisor_roles')
+    changed_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'role_supervisor_history'
+
+    def __str__(self):
+        return f"Role {self.role.r_id}: {self.old_supervisor} -> {self.new_supervisor} at {self.changed_at}"
+

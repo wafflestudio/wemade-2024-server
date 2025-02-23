@@ -1,26 +1,26 @@
 from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveUpdateDestroyAPIView
 from .models import PersonCardColumns, EmailDomain
 from .serializers import PersonCardColumnsSerializer, EmailDomainSerializer
-#from .permissions import *
+from company.permissions import IsMasterHRTeam
 
 
 # PersonCardColumns 관련 뷰
 class PersonCardColumnsCreateAPIView(CreateAPIView):
     queryset = PersonCardColumns.objects.all()
     serializer_class = PersonCardColumnsSerializer
-    #permission_classes = [IsMaster]
+    permission_classes = [IsMasterHRTeam]
 
 
 class PersonCardColumnsListAPIView(ListAPIView):
     queryset = PersonCardColumns.objects.all()
     serializer_class = PersonCardColumnsSerializer
-    #permission_classes = [IsMaster]
+    permission_classes = [IsMasterHRTeam]
 
 
 class PersonCardColumnsUpdateAPIView(RetrieveUpdateDestroyAPIView):
     queryset = PersonCardColumns.objects.all()
     serializer_class = PersonCardColumnsSerializer
-    #permission_classes = [IsMaster]
+    permission_classes = [IsMasterHRTeam]
     lookup_field = 'pk'  # 기본 primary key 사용
 
 
@@ -28,17 +28,17 @@ class PersonCardColumnsUpdateAPIView(RetrieveUpdateDestroyAPIView):
 class EmailDomainCreateAPIView(CreateAPIView):
     queryset = EmailDomain.objects.all()
     serializer_class = EmailDomainSerializer
-    #permission_classes = [IsMaster]
+    permission_classes = [IsMasterHRTeam]
 
 
 class EmailDomainListAPIView(ListAPIView):
     queryset = EmailDomain.objects.all()
     serializer_class = EmailDomainSerializer
-    #permission_classes = [IsMaster]
+    permission_classes = [IsMasterHRTeam]
 
 
 class EmailDomainUpdateAPIView(RetrieveUpdateDestroyAPIView):
     queryset = EmailDomain.objects.all()
     serializer_class = EmailDomainSerializer
-    #permission_classes = [IsMaster]
+    permission_classes = [IsMasterHRTeam]
     lookup_field = 'pk'

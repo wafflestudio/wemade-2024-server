@@ -6,7 +6,6 @@ class PersonCardColumns(models.Model):
     COLUMN_TYPE_CHOICES = (
         ('img', 'Image'),
         ('txt', 'Text'),
-        ('pdf', 'PDF'),
     )
 
     column_name = models.CharField(

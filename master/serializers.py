@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models import PersonCardColumns, EmailDomain
+from personCard.models import PersonCardColumns
+from oauth.models import EmailDomain
 
 
 class PersonCardColumnsSerializer(serializers.ModelSerializer):

@@ -29,6 +29,7 @@ class PersonSearchAPIView(APIView):
         query = request.query_params.get('q', '')
         filter_corp = request.query_params.get('corp_id')
         filter_team = request.query_params.get('team_id')
+        filter_role = request.query_params.get('role')
 
         persons = Person.objects.all()
 
@@ -50,6 +51,9 @@ class PersonSearchAPIView(APIView):
                 team_ids.update(self.get_lower_team_ids(team))
         if team_ids:
             persons = persons.filter(member_of_teams__t_id__in=team_ids)
+
+        if filter_role:
+            persons = persons.filter(roles__role_name__icontains=filter_role)
 
         # 검색 조건 적용
         if search_by == 'name':

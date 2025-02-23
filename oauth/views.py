@@ -4,7 +4,8 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.views import TokenBlacklistView
 
 from person.models import Person, PersonalInfo
-
+from company.models import Role
+from company.serializers import RoleSerializer
 
 from django.conf import settings
 from oauth.models import OauthInfo, EmailDomain
@@ -84,11 +85,13 @@ class GoogleLoginCallback(APIView):
         refresh = RefreshToken.for_user(user)
         access_token = str(refresh.access_token)
 
+        roles_serialized = RoleSerializer(person.roles.all(), many=True).data
+
         return Response(
             {
                 "access_token": access_token,
                 "refresh_token": str(refresh),
-                "roles": person.roles, # 내부 구조: {{"t_id": "", "role": "부서원"}, {"t_id": "", "role":""},...}
+                "roles": roles_serialized
             },
             status=status.HTTP_200_OK,
         )

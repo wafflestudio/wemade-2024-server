@@ -32,27 +32,27 @@ class Person(models.Model):
     corporations = models.ManyToManyField('company.Corporation', related_name="corporation_persons", blank=True)
     teams = models.ManyToManyField('company.Team', related_name="team_persons", blank=True)
 
-    roles = models.JSONField(null=True, blank=True) # 내부 구조: {{"t_id": "", "role": "부서원"}, {"t_id": "", "role":""},...}
+    # roles = models.JSONField(null=True, blank=True) # 내부 구조: {{"t_id": "", "role": "부서원"}, {"t_id": "", "role":""},...}
 
     class Meta:
         db_table = "person"
         app_label = "person"
 
 
-class PersonalHistory(models.Model):
-    person = models.ForeignKey(
-        'person.Person',
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name='personal_histories'
-    )
-    start_date = models.DateTimeField()
-    end_date = models.DateTimeField(null=True)
-    team = models.ForeignKey('company.Team', on_delete=models.SET_NULL, null=True)
-    role = models.CharField(max_length=20)  # 한 팀에서는 role이 하나라고 가정
-    supervisor = models.IntegerField()  # 해당 시기 team의 team_leader(p_id)
-    job_description = models.TextField(null=True)
-
-    class Meta:
-        db_table = 'personal_history'
+# class PersonalHistory(models.Model):
+#     person = models.ForeignKey(
+#         'person.Person',
+#         on_delete=models.SET_NULL,
+#         null=True,
+#         related_name='personal_histories'
+#     )
+#     start_date = models.DateTimeField()
+#     end_date = models.DateTimeField(null=True)
+#     team = models.ForeignKey('company.Team', on_delete=models.SET_NULL, null=True)
+#     role = models.CharField(max_length=20)  # 한 팀에서는 role이 하나라고 가정
+#     supervisor = models.IntegerField()  # 해당 시기 team의 team_leader(p_id)
+#     job_description = models.TextField(null=True)
+#
+#     class Meta:
+#         db_table = 'personal_history'
 
