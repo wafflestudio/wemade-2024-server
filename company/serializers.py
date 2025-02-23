@@ -7,7 +7,7 @@ from person.models import Person
 class CorpListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Corporation
-        fields = ['c_id', 'name', 'is_active']
+        fields = ['c_id', 'name', 'sub_teams', 'is_active']
 
 
 class CorpDetailSerializer(serializers.ModelSerializer):
@@ -16,7 +16,7 @@ class CorpDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Corporation
-        fields = ['c_id', 'name', 'sub_teams', 'is_active']
+        fields = ['c_id', 'name', 'sub_teams', 'hr_team', 'is_active']
 
 
 class CorpCreateSerializer(serializers.ModelSerializer):
@@ -25,7 +25,7 @@ class CorpCreateSerializer(serializers.ModelSerializer):
         fields = ['name', 'sub_teams', 'is_active']
 
 
-class CorpUpdateDeleteSerializer(serializers.ModelSerializer):
+class CorpEditUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Corporation
         fields = ['name', 'sub_teams', 'is_active']
@@ -54,6 +54,16 @@ class CorpUpdateDeleteSerializer(serializers.ModelSerializer):
 
 # Team Serializers
 class TeamListSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Team
+        fields = ['t_id', 'name', 'corporation', 'sub_teams', 'is_active']
+
+
+class TeamEditListSerializer(serializers.ModelSerializer):
+    corporation = CorpDetailSerializer(read_only=True)
+    # 하위 조직은 역참조인 lower_teams를 TeamListSerializer로 표시
+    sub_teams = TeamListSerializer(many=True, read_only=True, source='lower_teams')
 
     class Meta:
         model = Team
@@ -121,7 +131,7 @@ class TeamCreateSerializer(serializers.ModelSerializer):
         # if corporation and Team.objects.filter(corporation=corporation, name=name, is_active=True).exists():
         #     raise serializers.ValidationError("같은 corporation 내에 활성 상태의 동일한 이름의 팀이 이미 존재합니다.")
 
-        # 팀 생성일 자동 저장 (Team 모델에 created_at 필드가 있다고 가정)
+        # 팀 생성일 자동 저장
         validated_data['created_at'] = timezone.now()
 
         # 팀 생성
@@ -139,7 +149,15 @@ class TeamCreateSerializer(serializers.ModelSerializer):
         return team
 
 
-class TeamUpdateDeleteSerializer(serializers.ModelSerializer):
+class TeamEditUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Team
+        fields = [
+            'name', 'corporation', 'sub_teams', 'parent_teams'
+        ]
+
+
+class TeamUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Team
         fields = [

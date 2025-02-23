@@ -7,6 +7,8 @@ from rest_framework.response import Response
 from rest_framework.exceptions import NotFound
 from rest_framework.permissions import AllowAny
 
+from rest_condition import Or
+
 from person.models import Person, PersonalInfo, PersonalHistory
 from .serializers import *
 from .paginations import *
@@ -29,7 +31,7 @@ class PersonCardListAPIView(ListAPIView):
 # 검색 페이지 우측 특정한 사람 공개 정보 불러오기
 class PersonCardListDetailAPIView(RetrieveAPIView):
     serializer_class = PersonCardListDetailSerializer
-    permission_classes =  [AllowAny]
+    permission_classes = [AllowAny]
 
     def retrieve(self, request, *args, **kwargs):
         person = get_object_or_404(Person, p_id=kwargs.get('p_id'))
@@ -39,7 +41,7 @@ class PersonCardListDetailAPIView(RetrieveAPIView):
 # 인사카드 조회
 class PersonCardDetailAPIView(RetrieveAPIView):
     serializer_class = PersonCardDetailSerializer
-    permission_classes = [OR(IsMasterHRTeam, IsOwnerOrHRTeamOrTeamLeader)]
+    permission_classes = [Or(IsMasterHRTeam, IsOwnerOrHRTeamOrTeamLeader)]
 
     def retrieve(self, request, *args, **kwargs):
         person = get_object_or_404(Person, p_id=kwargs.get('p_id'))
@@ -53,7 +55,7 @@ class PersonalInfoUpdateAPIView(RetrieveUpdateDestroyAPIView):
     serializer_class = PersonalInfoUpdateSerializer
     lookup_field = 'person__p_id'
     lookup_url_kwarg = 'p_id'
-    permission_classes = [OR(IsMasterHRTeam, IsOwnerOrHRTeam)]
+    permission_classes = [Or(IsMasterHRTeam, IsOwnerOrHRTeam)]
 
 
 # 직무 업데이트 (HR Team) + 직무 히스토리 생성
@@ -61,13 +63,13 @@ class PersonRolesUpdateAPIView(RetrieveUpdateAPIView):
     queryset = Person.objects.all()
     serializer_class = PersonRolesUpdateSerializer
     lookup_field = 'p_id'  # URL에서 p_id를 사용해 Person을 조회
-    permission_classes = [OR(IsMasterHRTeam, IsHRTeam)]
+    permission_classes = [Or(IsMasterHRTeam, IsHRTeam)]
 
 
 # 직무 히스토리 정보 불러오기
 class PersonalHistoryListAPIView(ListAPIView):
     serializer_class = PersonalHistorySerializer
-    permission_classes = [OR(IsMasterHRTeam, IsOwnerOrHRTeamOrTeamLeader)]
+    permission_classes = [Or(IsMasterHRTeam, IsOwnerOrHRTeamOrTeamLeader)]
 
     def get_queryset(self):
         p_id = self.kwargs.get('p_id')
@@ -78,7 +80,7 @@ class PersonalHistoryListAPIView(ListAPIView):
 # 직무 히스토리 내 직무 설명(job description) 수정하기
 class PersonalHistoryUpdateAPIView(RetrieveUpdateAPIView):
     serializer_class = PersonalHistoryUpdateSerializer
-    permission_classes = [OR(IsMasterHRTeam, IsOwnerOrHRTeam)]
+    permission_classes = [Or(IsMasterHRTeam, IsOwnerOrHRTeam)]
 
     def get_object(self):
         p_id = self.kwargs.get('p_id')
@@ -99,7 +101,7 @@ class PersonalHistoryUpdateAPIView(RetrieveUpdateAPIView):
  # 직무 히스토리 삭제하기 (HR Team)
 class PersonalHistoryDeleteAPIView(DestroyAPIView):
     serializer_class = PersonalHistorySerializer
-    permission_classes = [OR(IsMasterHRTeam, IsHRTeam)]
+    permission_classes = [Or(IsMasterHRTeam, IsHRTeam)]
 
     def get_object(self):
         p_id = self.kwargs.get('p_id')
