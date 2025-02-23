@@ -54,14 +54,10 @@ class CorpUpdateDeleteSerializer(serializers.ModelSerializer):
 
 # Team Serializers
 class TeamListSerializer(serializers.ModelSerializer):
-    member_count = serializers.SerializerMethodField()
 
     class Meta:
         model = Team
-        fields = ['t_id', 'name', 'corporation', 'member_count', 'is_active']
-
-    def get_member_count(self, obj):
-        return obj.members.count()
+        fields = ['t_id', 'name', 'corporation', 'sub_teams', 'is_active']
 
 
 class TeamDetailSerializer(serializers.ModelSerializer):
