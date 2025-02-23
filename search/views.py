@@ -53,7 +53,8 @@ class PersonSearchAPIView(APIView):
         filter_corp = request.query_params.get('corp_id')
         filter_team = request.query_params.get('team_id')
 
-        persons = Person.objects.all()
+        persons = Person.objects.all().order_by('name')
+
         if query:
             persons = persons.filter(name__icontains=query)
         if certificate:
@@ -73,7 +74,7 @@ class TeamSearchAPIView(APIView):
 
     def get(self, request, *args, **kwargs):
         query = request.query_params.get('q', '')
-        teams = Team.objects.all()
+        teams = Team.objects.all().order_by('name')
         if query:
             teams = teams.filter(name__icontains=query)
         serializer = TeamListSerializer(teams, many=True)
@@ -86,7 +87,7 @@ class CorpSearchAPIView(APIView):
 
     def get(self, request, *args, **kwargs):
         query = request.query_params.get('q', '')
-        corps = Corporation.objects.all()
+        corps = Corporation.objects.all().order_by('name')
         if query:
             corps = corps.filter(name__icontains=query)
         serializer = CorpListSerializer(corps, many=True)
@@ -122,7 +123,7 @@ class TeamSubMembersSearchAPIView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        persons = Person.objects.filter(member_of_teams__t_id__in=team_ids).distinct()
+        persons = Person.objects.filter(member_of_teams__t_id__in=team_ids).distinct().order_by('name')
         serializer = PersonCardListSerializer(persons, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
