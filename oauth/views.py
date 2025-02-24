@@ -5,7 +5,7 @@ from rest_framework_simplejwt.views import TokenBlacklistView
 
 from person.models import Person, PersonalInfo
 from company.models import Role
-from company.serializers import RoleSerializer
+from company.serializers import ActiveRoleSerializer
 
 from django.conf import settings
 from oauth.models import OauthInfo, EmailDomain
@@ -85,7 +85,7 @@ class GoogleLoginCallback(APIView):
         refresh = RefreshToken.for_user(user)
         access_token = str(refresh.access_token)
 
-        roles_serialized = RoleSerializer(person.roles.all(), many=True).data
+        roles_serialized = ActiveRoleSerializer(person.roles.filter(end_date__isnull=True), many=True).data
 
         return Response(
             {

@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from person.models import Person, PersonalInfo, PersonCardInfo, PersonalHistory
+from company.models import Role, RoleSupervisorHistory
 from django.utils import timezone
 
 
@@ -97,74 +98,59 @@ class PersonalInfoUpdateSerializer(serializers.ModelSerializer):
         return instance
 
 
-class PersonRolesUpdateSerializer(serializers.ModelSerializer):
-    # roles:  [{"t_id": 1, "role": "부서원"}, {"t_id": 2, "role": "팀장"}, ...]
-    roles = serializers.JSONField()
+class RoleSupervisorHistorySerializer(serializers.ModelSerializer):
+    old_supervisor_id = serializers.IntegerField(source='old_supervisor.p_id', read_only=True)
+    old_supervisor_name = serializers.CharField(source='old_supervisor.name', read_only=True)
+    new_supervisor_id = serializers.IntegerField(source='new_supervisor.p_id', read_only=True)
+    new_supervisor_name = serializers.CharField(source='new_supervisor.name', read_only=True)
 
     class Meta:
-        model = Person
-        fields = ['roles']
+        model = RoleSupervisorHistory
+        fields = [
+            'id', #RoleSupervisorHistory id
+            'old_supervisor_id',
+            'old_supervisor_name',
+            'new_supervisor_id',
+            'new_supervisor_name',
+            'changed_at',
+        ]
 
-    def update(self, instance, validated_data):
-        with transaction.atomic():
-            roles_data = validated_data.get('roles', [])
-            instance.roles = roles_data
-            instance.save()
+# 직무 히스토리 정보 불러오기
+class RoleHistorySerializer(serializers.ModelSerializer):
+    # Nested: supervisor_history
+    supervisor_history = RoleSupervisorHistorySerializer(
+        many=True,
+        read_only=True,
+        source='supervisor_history'
+    )
 
-            # Step 1. ManyToMany Field (teams) 업데이트:
-            # roles_data에서 각 딕셔너리의 t_id 값을 추출하여, Person의 팀 관계를 설정합니다.
-            team_ids = [role_info.get('t_id') for role_info in roles_data if role_info.get('t_id')]
-            # ManyToMany 관계 업데이트: 해당 팀 목록으로 교체(set)
-            instance.teams.set(team_ids)
+    # team, supervisor 필드 등 추가
+    t_id = serializers.IntegerField(source='team.t_id', read_only=True)
+    team_name = serializers.CharField(source='team.name', read_only=True)
+    supervisor_id = serializers.IntegerField(source='supervisor.p_id', read_only=True)
+    supervisor_name = serializers.CharField(source='supervisor.name', read_only=True)
 
-            # Step 2. PersonalHistory 업데이트:
-            # 각 역할 정보를 기준으로 개인 이력(PersonalHistory)을 업데이트하거나 새 레코드를 생성합니다.
-            for role_info in roles_data:
-                team_id = role_info.get('t_id')
-                role_value = role_info.get('role')
-
-                if not team_id:
-                    continue
-
-                # 현재 진행 중(종료일(end_date)이 없는) 해당 팀의 이력이 있는지 확인
-                history = instance.personal_histories.filter(t_id=team_id, end_date__isnull=True).first()
-                team_instance = Team.objects.get(pk=team_id)  # team이 먼저 존재한다고 가정
-
-                if history:
-                    if history.role != role_value:
-                        # 기존 이력이 있으나 역할이 달라졌다면, 새로운 이력 레코드를 생성
-                        history.end_date = timezone.now()
-                        history.save()
-                        PersonalHistory.objects.create(
-                            person=instance,
-                            start_date=timezone.now(),
-                            team=team_instance,
-                            role=role_value,
-                            supervisor=None  # supervisor 업데이트는 팀 로직에 따라 처리 (예: 팀 리더 정보 활용)
-                        )
-                    # 역할이 동일한 경우는 아무런 작업을 하지 않습니다.
-                else:
-                    # 진행 중인 이력이 없으면 새 레코드를 생성합니다.
-                    PersonalHistory.objects.create(
-                        person=instance,
-                        start_date=timezone.now(),
-                        team=team_instance,
-                        role=role_value,
-                        supervisor=None
-                    )
-
-        return instance
-
-
-class PersonalHistorySerializer(serializers.ModelSerializer):
     class Meta:
-        model = PersonalHistory
-        fields = ['id', 'start_date', 'end_date', 'team', 'role', 'supervisor', 'job_description']
+        model = Role
+        fields = [
+            'r_id',
+            't_id',
+            'team_name',
+            'role_name',
+            'supervisor_id',
+            'supervisor_name',
+            'start_date',
+            'end_date',
+            'job_description',
+            'is_HR',
+            'supervisor_history'
+        ]
+
 
 
 # 직무 설명(job_description) 업데이트만을 위한 serializer
-class PersonalHistoryUpdateSerializer(serializers.ModelSerializer):
+class RoleHistoryUpdateSerializer(serializers.ModelSerializer):
     class Meta:
-        model = PersonalHistory
+        model = Role
         fields = ['job_description']
 

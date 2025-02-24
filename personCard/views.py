@@ -9,7 +9,8 @@ from rest_framework.permissions import AllowAny
 
 from rest_condition import Or
 
-from person.models import Person, PersonalInfo, PersonalHistory
+from person.models import Person, PersonalInfo
+from company.models import Role, RoleSupervisorHistory
 from .serializers import *
 from .paginations import *
 from .permissions import *
@@ -58,28 +59,21 @@ class PersonalInfoUpdateAPIView(RetrieveUpdateDestroyAPIView):
     permission_classes = [Or(IsMasterHRTeam, IsOwnerOrHRTeam)]
 
 
-# 직무 업데이트 (HR Team) + 직무 히스토리 생성
-class PersonRolesUpdateAPIView(RetrieveUpdateAPIView):
-    queryset = Person.objects.all()
-    serializer_class = PersonRolesUpdateSerializer
-    lookup_field = 'p_id'  # URL에서 p_id를 사용해 Person을 조회
-    permission_classes = [Or(IsMasterHRTeam, IsHRTeam)]
-
-
 # 직무 히스토리 정보 불러오기
-class PersonalHistoryListAPIView(ListAPIView):
-    serializer_class = PersonalHistorySerializer
+class RoleHistoryListAPIView(ListAPIView):
+    serializer_class = RoleHistorySerializer
     permission_classes = [Or(IsMasterHRTeam, IsOwnerOrHRTeamOrTeamLeader)]
 
     def get_queryset(self):
         p_id = self.kwargs.get('p_id')
-        self.check_object_permissions(request, person)
-        return PersonalHistory.objects.filter(person__p_id=p_id)
+        person = get_object_or_404(Person, p_id=p_id)
+        self.check_object_permissions(self.request, person)
+        return Role.objects.filter(person=person).order_by('-start_date')
 
 
 # 직무 히스토리 내 직무 설명(job description) 수정하기
-class PersonalHistoryUpdateAPIView(RetrieveUpdateAPIView):
-    serializer_class = PersonalHistoryUpdateSerializer
+class RoleHistoryUpdateAPIView(RetrieveUpdateAPIView):
+    serializer_class = RoleHistoryUpdateSerializer
     permission_classes = [Or(IsMasterHRTeam, IsOwnerOrHRTeam)]
 
     def get_object(self):
@@ -87,34 +81,10 @@ class PersonalHistoryUpdateAPIView(RetrieveUpdateAPIView):
         person = get_object_or_404(Person, p_id=p_id)
         self.check_object_permissions(self.request, person)
 
-        # history_id는 요청 데이터나 쿼리 파라미터에서 전달받음
-        history_id = self.request.data.get('history_id') or self.request.query_params.get('history_id')
-        if not history_id:
-            raise NotFound("history_id가 제공되지 않았습니다.")
+        # role_id는 요청 데이터나 쿼리 파라미터에서 전달
+        role_id = self.request.data.get('role_id') or self.request.query_params.get('role_id')
+        if not role_id:
+            raise NotFound("role_id가 제공되지 않았습니다.")
 
-        qs = person.personal_histories.all()
-        obj = get_object_or_404(qs, id=history_id)
-
+        obj = get_object_or_404(Role, r_id=role_id, person=person)
         return obj
-
-
- # 직무 히스토리 삭제하기 (HR Team)
-class PersonalHistoryDeleteAPIView(DestroyAPIView):
-    serializer_class = PersonalHistorySerializer
-    permission_classes = [Or(IsMasterHRTeam, IsHRTeam)]
-
-    def get_object(self):
-        p_id = self.kwargs.get('p_id')
-        person = get_object_or_404(Person, p_id=p_id)
-        self.check_object_permissions(self.request, person)
-
-        # history_id는 요청 데이터나 쿼리 파라미터에서 전달받음
-        history_id = self.request.data.get('history_id') or self.request.query_params.get('history_id')
-        if not history_id:
-            raise NotFound("history_id가 제공되지 않았습니다.")
-
-        qs = person.personal_histories.all()
-        obj = get_object_or_404(qs, id=history_id)
-
-        return obj
-

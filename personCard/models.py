@@ -23,6 +23,10 @@ class PersonCardColumns(models.Model):
         verbose_name="다중 값 허용",
         help_text="여러 개의 값이 입력될 수 있으면 True (예: 학력), 단일 값이면 False (예: 생일)"
     )
+    permission_required = models.BooleanField(
+        default=False,
+        verbose_name="수정 시 변경 허가 필요"
+    )
     is_supporting_material_required = models.BooleanField(
         default=False,
         verbose_name="증빙자료 필요 여부",
