@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Corporation, Team
+from .models import Corporation, Team, Commit
 from person.models import Person
 
 
@@ -70,12 +70,20 @@ class TeamDetailSerializer(serializers.ModelSerializer):
 
 
 class TeamCreateSerializer(serializers.ModelSerializer):
+    parent_team_history = serializers.ListField(default=list)
+    name_history = serializers.ListField(default=list)
     class Meta:
         model = Team
-        fields = ['name', 'corporation', 'sub_teams', 'parent_teams', 'members', 'team_leader']
-
+        fields = ['t_id', 'name', 'corporation', 'sub_teams', 'parent_teams', 'members', 'team_leader', 'parent_team_history', 'name_history', 'last_commit']
+        read_only_fields = ['t_id']
 
 class TeamUpdateDeleteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Team
-        fields = ['name', 'corporation', 'sub_teams', 'parent_teams', 'members', 'team_leader']
+        fields = ['t_id', 'name', 'corporation', 'sub_teams', 'parent_teams', 'members', 'team_leader']
+        read_only_fields = ['t_id']
+
+class CommitListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Commit
+        fields = ['commit_id', 'commit_message', 'commit_date', 'commit_author', 'commit_content']
