@@ -13,7 +13,7 @@ from django.db.models import F, Func, CharField
 
 class RemoveSpaces(Func):
     function = "REPLACE"
-    template = "%(function)s(%(expressions)s, ' ', '')"
+    template = "%(function)s(%(expressions)s::text, ' ', '')"
     output_field = CharField()
 
 

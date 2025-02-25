@@ -9,9 +9,19 @@ class PersonCardListSerializer(serializers.ModelSerializer):
     phone_number = serializers.CharField(
         source="personal_info.main_phone_number", required=False, allow_null=True
     )
-    corporation = serializers.CharField(default="")
-    team = serializers.CharField(default="")
-    role = serializers.JSONField(required=False, allow_null=True)
+    corporations = serializers.SerializerMethodField()
+    teams = serializers.SerializerMethodField()
+    roles = serializers.SerializerMethodField()
+
+    def get_corporations(self, obj):
+        return list(set(team.corporation.c_id for team in obj.member_of_teams.all()))
+    def get_teams(self, obj):
+        return [team.t_id for team in obj.member_of_teams.all()]
+    def get_roles(self, obj):
+        return [
+            {"t_id": role.team.t_id, "r_id": role.r_id, "role": role.role_name}
+            for role in obj.roles.filter(end_date__isnull=True)
+        ]
 
     class Meta:
         model = Person
@@ -20,9 +30,9 @@ class PersonCardListSerializer(serializers.ModelSerializer):
             "name",
             "emails",
             "phone_number",
-            "corporation",
-            "team",
-            "role",
+            "corporations",
+            "teams",
+            "roles",
         ]
 
     def get_emails(self, obj):
