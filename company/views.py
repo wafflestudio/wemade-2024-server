@@ -1,11 +1,10 @@
-from django.shortcuts import get_object_or_404
 from rest_framework.generics import (
-    ListAPIView, CreateAPIView, RetrieveAPIView,
+    ListAPIView,
+    CreateAPIView,
+    RetrieveAPIView,
     RetrieveUpdateAPIView,
-    RetrieveDestroyAPIView
+    RetrieveDestroyAPIView,
 )
-from rest_framework.response import Response
-from rest_framework import status
 from rest_framework.permissions import AllowAny
 
 from rest_condition import Or
@@ -25,18 +24,20 @@ class EditListAPIView(ListAPIView):
         user_person = self.request.user.person
         # 만약 요청 사용자가 MasterHRTeam이면 모든 법인을, 아니라면 자신이 HR팀 구성원인 법인 반환
         if IsMasterHRTeam().has_permission(self.request, self):
-            qs = Corporation.objects.all().order_by('name')
+            qs = Corporation.objects.all().order_by("name")
         else:
-            qs = Corporation.objects.filter(hr_team__members=user_person).order_by(('name'))
+            qs = Corporation.objects.filter(hr_team__members=user_person).order_by(
+                ("name")
+            )
         return qs
 
 
 # Edit mode Team List
 class TeamEditListAPIView(ListAPIView):
     serializer_class = TeamEditListSerializer
-    queryset = Team.objects.all().order_by('name')
-    lookup_field = 't_id'
-    lookup_url_kwarg = 't_id'
+    queryset = Team.objects.all().order_by("name")
+    lookup_field = "t_id"
+    lookup_url_kwarg = "t_id"
     permission_classes = [Or(IsMasterHRTeam, IsHRTeam)]
 
 
@@ -44,8 +45,8 @@ class TeamEditListAPIView(ListAPIView):
 class CorpEditUpdateDeleteAPIView(RetrieveUpdateAPIView):
     serializer_class = CorpEditUpdateSerializer
     queryset = Corporation.objects.all()
-    lookup_field = 'c_id'
-    lookup_url_kwarg = 'c_id'
+    lookup_field = "c_id"
+    lookup_url_kwarg = "c_id"
     permission_classes = [IsMasterHRTeam]
 
 
@@ -53,10 +54,9 @@ class CorpEditUpdateDeleteAPIView(RetrieveUpdateAPIView):
 class TeamEditUpdateDeleteAPIView(RetrieveUpdateAPIView):
     serializer_class = TeamEditUpdateSerializer
     queryset = Team.objects.all()
-    lookup_field = 't_id'
-    lookup_url_kwarg = 't_id'
+    lookup_field = "t_id"
+    lookup_url_kwarg = "t_id"
     permission_classes = [Or(IsMasterHRTeam, IsHRTeam)]
-
 
 
 # --------- 인사 이동 관련 Views ------------
@@ -65,6 +65,7 @@ class RoleCreateAPIView(CreateAPIView):
     queryset = Role.objects.all()
     serializer_class = RoleCreateSerializer
     permission_classes = [Or(IsMasterHRTeam, IsHRTeam)]
+
 
 # 특정한 사람의 role 변경 (직급 변경)
 class RoleUpdateAPIView(RetrieveUpdateAPIView):
@@ -80,10 +81,9 @@ class RoleUpdateAPIView(RetrieveUpdateAPIView):
 #     lookup_field = 'p_id'  # URL에서 p_id를 사용해 Person을 조회
 #     permission_classes = [Or(IsMasterHRTeam, IsHRTeam)]
 
-#
-
 
 # --------- 추가 기능 Views ------------
+
 
 # --- Corporation Views ---
 # 새로운 Corporation 생성
@@ -95,11 +95,11 @@ class CorpCreateAPIView(CreateAPIView):
 # 모든 Corporation List
 class CorpListAPIView(ListAPIView):
     serializer_class = CorpListSerializer
-    #pagination_class = CorpListPagination
+    # pagination_class = CorpListPagination
     permission_classes = [AllowAny]
 
     def get_queryset(self):
-        name = self.request.query_params.get('name')
+        name = self.request.query_params.get("name")
         if name:
             return Corporation.objects.filter(name__icontains=name)
         return Corporation.objects.all()
@@ -109,16 +109,16 @@ class CorpListAPIView(ListAPIView):
 class CorpDetailAPIView(RetrieveAPIView):
     serializer_class = CorpDetailSerializer
     queryset = Corporation.objects.all()
-    lookup_field = 'c_id'
-    lookup_url_kwarg = 'c_id'
+    lookup_field = "c_id"
+    lookup_url_kwarg = "c_id"
     permission_classes = [AllowAny]
 
 
 class CorpDeleteAPIView(RetrieveDestroyAPIView):
     serializer_class = CorpDetailSerializer
     queryset = Corporation.objects.all()
-    lookup_field = 'c_id'
-    lookup_url_kwarg = 'c_id'
+    lookup_field = "c_id"
+    lookup_url_kwarg = "c_id"
     permission_classes = [IsMasterHRTeam]
 
     def perform_destroy(self, instance):
@@ -173,11 +173,11 @@ class TeamCreateAPIView(CreateAPIView):
 # 모든 Team List
 class TeamListAPIView(ListAPIView):
     serializer_class = TeamListSerializer
-    #pagination_class = TeamListPagination
+    # pagination_class = TeamListPagination
     permission_classes = [AllowAny]
 
     def get_queryset(self):
-        name = self.request.query_params.get('name')
+        name = self.request.query_params.get("name")
         if name:
             return Team.objects.filter(name__icontains=name)
         return Team.objects.all()
@@ -187,16 +187,16 @@ class TeamListAPIView(ListAPIView):
 class TeamDetailAPIView(RetrieveAPIView):
     serializer_class = TeamDetailSerializer
     queryset = Team.objects.all()
-    lookup_field = 't_id'
-    lookup_url_kwarg = 't_id'
+    lookup_field = "t_id"
+    lookup_url_kwarg = "t_id"
     permission_classes = [AllowAny]
 
 
 class TeamDeleteAPIView(RetrieveDestroyAPIView):
     serializer_class = TeamDetailSerializer
     queryset = Team.objects.all()
-    lookup_field = 't_id'
-    lookup_url_kwarg = 't_id'
+    lookup_field = "t_id"
+    lookup_url_kwarg = "t_id"
     permission_classes = [IsMasterHRTeam]
 
     def perform_destroy(self, instance):
@@ -244,8 +244,8 @@ class TeamDeleteAPIView(RetrieveDestroyAPIView):
 class RoleDeleteAPIView(RetrieveDestroyAPIView):
     serializer_class = RoleDetailSerializer
     queryset = Corporation.objects.all()
-    lookup_field = 'r_id'
-    lookup_url_kwarg = 'r_id'
+    lookup_field = "r_id"
+    lookup_url_kwarg = "r_id"
     permission_classes = [IsMasterHRTeam]
 
     def perform_destroy(self, instance):

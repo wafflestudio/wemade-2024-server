@@ -19,8 +19,8 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-CSRF_TRUSTED_ORIGINS= ['https://*.azurewebsites.net']
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+CSRF_TRUSTED_ORIGINS = ["https://*.azurewebsites.net"]
 
 
 # Quick-start development settings - unsuitable for production
@@ -33,9 +33,9 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 DEBUG = os.environ.get("DEBUG")
 
 ALLOWED_HOSTS = [
-    'wemade-2024-server-h0csbcbdesdbe0ep.eastasia-01.azurewebsites.net',
-    'localhost',
-    '127.0.0.1'
+    "wemade-2024-server-h0csbcbdesdbe0ep.eastasia-01.azurewebsites.net",
+    "localhost",
+    "127.0.0.1",
 ]
 
 
@@ -177,7 +177,11 @@ CORS_ORIGIN_ALLOW_ALL = True
 # Google OAuth
 GOOGLE_OAUTH_CLIENT_ID = os.getenv("GOOGLE_OAUTH_CLIENT_ID")
 GOOGLE_OAUTH_CLIENT_SECRET = os.getenv("GOOGLE_OAUTH_CLIENT_SECRET")
-GOOGLE_OAUTH_CALLBACK_URLS = {"prod": os.getenv("GOOGLE_OAUTH_CALLBACK_URL_PROD"), "dev": os.getenv("GOOGLE_OAUTH_CALLBACK_URL_DEV"), "local": os.getenv("GOOGLE_OAUTH_CALLBACK_URL_LOCAL")}
+GOOGLE_OAUTH_CALLBACK_URLS = {
+    "prod": os.getenv("GOOGLE_OAUTH_CALLBACK_URL_PROD"),
+    "dev": os.getenv("GOOGLE_OAUTH_CALLBACK_URL_DEV"),
+    "local": os.getenv("GOOGLE_OAUTH_CALLBACK_URL_LOCAL"),
+}
 GOOGLE_OAUTH_CALLBACK_URL_BACKEND = os.getenv("GOOGLE_OAUTH_CALLBACK_URL_BACKEND")
 
 SOCIALACCOUNT_PROVIDERS = {
@@ -199,8 +203,8 @@ SOCIALACCOUNT_PROVIDERS = {
 SITE_ID = 1
 
 AUTHENTICATION_BACKENDS = (
-    'django.contrib.auth.backends.ModelBackend',
-    'allauth.account.auth_backends.AuthenticationBackend',
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
 )
 
 REST_USE_JWT = True
@@ -214,8 +218,8 @@ SOCIALACCOUNT_EMAIL_AUTHENTICATION = True
 SOCIALACCOUNT_AUTO_SIGNUP = True
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
 }
 
@@ -232,7 +236,7 @@ SIMPLE_JWT = {
 }
 
 APPEND_SLASH = True
-AUTH_USER_MODEL = 'oauth.OauthInfo'
+AUTH_USER_MODEL = "oauth.OauthInfo"
 
 STORAGES = {
     "default": {
@@ -249,14 +253,10 @@ STORAGES = {
 }
 
 SWAGGER_SETTINGS = {
-    'SECURITY_DEFINITIONS': {
-        'api_key': {
-            'type': 'apiKey',
-            'in': 'header',
-            'name': 'Authorization'
-        }
+    "SECURITY_DEFINITIONS": {
+        "api_key": {"type": "apiKey", "in": "header", "name": "Authorization"}
     },
-    'USE_SESSION_AUTH': False,
+    "USE_SESSION_AUTH": False,
 }
 
 AZURE_ACCOUNT_NAME = os.getenv("AZURE_ACCOUNT_NAME")

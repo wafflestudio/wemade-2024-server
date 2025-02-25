@@ -1,4 +1,8 @@
-from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.generics import (
+    CreateAPIView,
+    ListAPIView,
+    RetrieveUpdateDestroyAPIView,
+)
 from personCard.models import PersonCardColumns
 from oauth.models import EmailDomain
 from .serializers import PersonCardColumnsSerializer, EmailDomainSerializer
@@ -22,7 +26,7 @@ class PersonCardColumnsUpdateAPIView(RetrieveUpdateDestroyAPIView):
     queryset = PersonCardColumns.objects.all()
     serializer_class = PersonCardColumnsSerializer
     permission_classes = [IsMasterHRTeam]
-    lookup_field = 'pk'  # 기본 primary key 사용
+    lookup_field = "pk"  # 기본 primary key 사용
 
 
 # EmailDomain 관련 뷰
@@ -42,4 +46,4 @@ class EmailDomainUpdateAPIView(RetrieveUpdateDestroyAPIView):
     queryset = EmailDomain.objects.all()
     serializer_class = EmailDomainSerializer
     permission_classes = [IsMasterHRTeam]
-    lookup_field = 'pk'
+    lookup_field = "pk"

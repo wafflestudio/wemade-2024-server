@@ -1,7 +1,9 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.generics import (
-    ListAPIView, ListCreateAPIView, RetrieveAPIView,
-    RetrieveUpdateDestroyAPIView, RetrieveUpdateAPIView, DestroyAPIView
+    ListAPIView,
+    RetrieveAPIView,
+    RetrieveUpdateDestroyAPIView,
+    RetrieveUpdateAPIView,
 )
 from rest_framework.response import Response
 from rest_framework.exceptions import NotFound
@@ -10,7 +12,7 @@ from rest_framework.permissions import AllowAny
 from rest_condition import Or
 
 from person.models import Person, PersonalInfo
-from company.models import Role, RoleSupervisorHistory
+from company.models import Role
 from .serializers import *
 from .paginations import *
 from .permissions import *
@@ -23,7 +25,7 @@ class PersonCardListAPIView(ListAPIView):
     permission_classes = [AllowAny]
 
     def get_queryset(self):
-        name = self.request.query_params.get('name')
+        name = self.request.query_params.get("name")
         if not name:
             return Person.objects.all()
         return Person.objects.filter(name__icontains=name)
@@ -35,7 +37,7 @@ class PersonCardListDetailAPIView(RetrieveAPIView):
     permission_classes = [AllowAny]
 
     def retrieve(self, request, *args, **kwargs):
-        person = get_object_or_404(Person, p_id=kwargs.get('p_id'))
+        person = get_object_or_404(Person, p_id=kwargs.get("p_id"))
         return Response(self.get_serializer(person).data, status=200)
 
 
@@ -45,7 +47,7 @@ class PersonCardDetailAPIView(RetrieveAPIView):
     permission_classes = [Or(IsMasterHRTeam, IsOwnerOrHRTeamOrTeamLeader)]
 
     def retrieve(self, request, *args, **kwargs):
-        person = get_object_or_404(Person, p_id=kwargs.get('p_id'))
+        person = get_object_or_404(Person, p_id=kwargs.get("p_id"))
         self.check_object_permissions(request, person)
         return Response(self.get_serializer(person).data, status=200)
 
@@ -54,8 +56,8 @@ class PersonCardDetailAPIView(RetrieveAPIView):
 class PersonalInfoUpdateAPIView(RetrieveUpdateDestroyAPIView):
     queryset = PersonalInfo.objects.all()
     serializer_class = PersonalInfoUpdateSerializer
-    lookup_field = 'person__p_id'
-    lookup_url_kwarg = 'p_id'
+    lookup_field = "person__p_id"
+    lookup_url_kwarg = "p_id"
     permission_classes = [Or(IsMasterHRTeam, IsOwnerOrHRTeam)]
 
 
@@ -65,10 +67,10 @@ class RoleHistoryListAPIView(ListAPIView):
     permission_classes = [Or(IsMasterHRTeam, IsOwnerOrHRTeamOrTeamLeader)]
 
     def get_queryset(self):
-        p_id = self.kwargs.get('p_id')
+        p_id = self.kwargs.get("p_id")
         person = get_object_or_404(Person, p_id=p_id)
         self.check_object_permissions(self.request, person)
-        return Role.objects.filter(person=person).order_by('-start_date')
+        return Role.objects.filter(person=person).order_by("-start_date")
 
 
 # 직무 히스토리 내 직무 설명(job description) 수정하기
@@ -77,12 +79,14 @@ class RoleHistoryUpdateAPIView(RetrieveUpdateAPIView):
     permission_classes = [Or(IsMasterHRTeam, IsOwnerOrHRTeam)]
 
     def get_object(self):
-        p_id = self.kwargs.get('p_id')
+        p_id = self.kwargs.get("p_id")
         person = get_object_or_404(Person, p_id=p_id)
         self.check_object_permissions(self.request, person)
 
         # role_id는 요청 데이터나 쿼리 파라미터에서 전달
-        role_id = self.request.data.get('role_id') or self.request.query_params.get('role_id')
+        role_id = self.request.data.get("role_id") or self.request.query_params.get(
+            "role_id"
+        )
         if not role_id:
             raise NotFound("role_id가 제공되지 않았습니다.")
 

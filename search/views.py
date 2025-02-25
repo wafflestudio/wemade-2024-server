@@ -1,5 +1,3 @@
-from django.shortcuts import render
-
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -10,11 +8,11 @@ from company.models import Team, Corporation
 from personCard.serializers import PersonCardListSerializer
 from company.serializers import CorpListSerializer, TeamListSerializer
 
-from django.db.models import F, Value, Func, CharField
+from django.db.models import F, Func, CharField
 
 
 class RemoveSpaces(Func):
-    function = 'REPLACE'
+    function = "REPLACE"
     template = "%(function)s(%(expressions)s, ' ', '')"
     output_field = CharField()
 
@@ -25,11 +23,11 @@ class PersonSearchAPIView(APIView):
 
     def get(self, request, *args, **kwargs):
         # 검색 기준: 'name' 또는 'certificate' (기본은 'name')
-        search_by = request.query_params.get('search_by', 'name').lower()
-        query = request.query_params.get('q', '')
-        filter_corp = request.query_params.get('corp_id')
-        filter_team = request.query_params.get('team_id')
-        filter_role = request.query_params.get('role')
+        search_by = request.query_params.get("search_by", "name").lower()
+        query = request.query_params.get("q", "")
+        filter_corp = request.query_params.get("corp_id")
+        filter_team = request.query_params.get("team_id")
+        filter_role = request.query_params.get("role")
 
         persons = Person.objects.all()
 
@@ -39,13 +37,18 @@ class PersonSearchAPIView(APIView):
             try:
                 team = Team.objects.get(t_id=filter_team)
             except Team.DoesNotExist:
-                return Response({"detail": "Team not found."}, status=status.HTTP_404_NOT_FOUND)
+                return Response(
+                    {"detail": "Team not found."}, status=status.HTTP_404_NOT_FOUND
+                )
             team_ids = self.get_lower_team_ids(team)
         elif filter_corp:
             try:
                 corp = Corporation.objects.get(c_id=filter_corp)
             except Corporation.DoesNotExist:
-                return Response({"detail": "Corporation not found."}, status=status.HTTP_404_NOT_FOUND)
+                return Response(
+                    {"detail": "Corporation not found."},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
             team_ids = set()
             for team in corp.teams.all():
                 team_ids.update(self.get_lower_team_ids(team))
@@ -56,28 +59,28 @@ class PersonSearchAPIView(APIView):
             persons = persons.filter(roles__role_name__icontains=filter_role)
 
         # 검색 조건 적용
-        if search_by == 'name':
+        if search_by == "name":
             if query:
-                query_clean = query.replace(' ', '')
-                persons = persons.annotate(
-                    clean_name=RemoveSpaces(F('name'))
-                ).filter(clean_name__icontains=query_clean)
-        elif search_by == 'certificate':
+                query_clean = query.replace(" ", "")
+                persons = persons.annotate(clean_name=RemoveSpaces(F("name"))).filter(
+                    clean_name__icontains=query_clean
+                )
+        elif search_by == "certificate":
             # certificate 검색 시에도 q 파라미터 사용
             if query:
-                query_clean = query.replace(' ', '')
+                query_clean = query.replace(" ", "")
                 persons = persons.annotate(
-                    clean_cert=RemoveSpaces(F('personal_info__p_info__certificates'))
+                    clean_cert=RemoveSpaces(F("personal_info__p_info__certificates"))
                 ).filter(clean_cert__icontains=query_clean)
         else:
             # 기본은 name 검색
             if query:
-                query_clean = query.replace(' ', '')
-                persons = persons.annotate(
-                    clean_name=RemoveSpaces(F('name'))
-                ).filter(clean_name__icontains=query_clean)
+                query_clean = query.replace(" ", "")
+                persons = persons.annotate(clean_name=RemoveSpaces(F("name"))).filter(
+                    clean_name__icontains=query_clean
+                )
 
-        persons = persons.distinct().order_by('name')
+        persons = persons.distinct().order_by("name")
         serializer = PersonCardListSerializer(persons, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -88,18 +91,18 @@ class PersonSearchAPIView(APIView):
         return ids
 
 
-
-
 # Team 이름으로 Team 검색
 class TeamSearchAPIView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request, *args, **kwargs):
-        query = request.query_params.get('q', '')
-        teams = Team.objects.all().order_by('name')
+        query = request.query_params.get("q", "")
+        teams = Team.objects.all().order_by("name")
         if query:
-            query_clean = query.replace(' ', '')
-            teams = teams.annotate(clean_name=RemoveSpaces(F('name'))).filter(clean_name__icontains=query_clean)
+            query_clean = query.replace(" ", "")
+            teams = teams.annotate(clean_name=RemoveSpaces(F("name"))).filter(
+                clean_name__icontains=query_clean
+            )
         serializer = TeamListSerializer(teams, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -109,11 +112,12 @@ class CorpSearchAPIView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request, *args, **kwargs):
-        query = request.query_params.get('q', '')
-        corps = Corporation.objects.all().order_by('name')
+        query = request.query_params.get("q", "")
+        corps = Corporation.objects.all().order_by("name")
         if query:
-            query_clean = query.replace(' ', '')
-            corps = corps.annotate(clean_name=RemoveSpaces(F('name'))).filter(clean_name__icontains=query_clean)
+            query_clean = query.replace(" ", "")
+            corps = corps.annotate(clean_name=RemoveSpaces(F("name"))).filter(
+                clean_name__icontains=query_clean
+            )
         serializer = CorpListSerializer(corps, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
