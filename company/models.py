@@ -14,6 +14,8 @@ class Corporation(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     deleted_at = models.DateTimeField(null=True, blank=True)
 
+    last_commit = models.ForeignKey('company.CompanyCommit', on_delete=models.SET_NULL, null=True, blank=True)
+
     class Meta:
         db_table = 'corporation'
 
@@ -35,6 +37,8 @@ class Team(models.Model):
     # 생성일과 삭제일 추가
     created_at = models.DateTimeField(auto_now_add=True)
     deleted_at = models.DateTimeField(null=True, blank=True)
+
+    last_commit = models.ForeignKey('company.CompanyCommit', on_delete=models.SET_NULL, null=True, blank=True)
 
     class Meta:
         db_table = 'team'
@@ -82,3 +86,50 @@ class RoleSupervisorHistory(models.Model):
     def __str__(self):
         return f"Role {self.role.r_id}: {self.old_supervisor} -> {self.new_supervisor} at {self.changed_at}"
 
+class CompanyCommit(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'company_commit'
+
+class CompanyCommitAction(models.Model):
+    class CommitType(models.TextChoices):
+        CREATE = 'CREATE'
+        UPDATE = 'UPDATE'
+        DELETE = 'DELETE'
+    commit = models.ForeignKey(CompanyCommit, on_delete=models.CASCADE, related_name='actions')
+    action = models.CharField(max_length=50, choices=CommitType.choices, default=CommitType.CREATE)
+
+    create_new_info = models.JSONField(null=True, blank=True)
+    prev_parent_id = models.BigIntegerField(null=True, blank=True)
+    new_parent_id = models.BigIntegerField(null=True, blank=True)
+    target_id = models.BigIntegerField(null=True, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'company_commit_action'
+
+class CorporationNameHistoryInfo(models.Model):
+    commit = models.ForeignKey(CompanyCommit, on_delete=models.CASCADE, related_name='corporation_name_histories')
+    name = models.CharField(max_length=255)
+    corporation = models.ForeignKey(Corporation, on_delete=models.CASCADE, related_name='name_histories')
+
+    class Meta:
+        db_table = 'corp_name_history'
+
+class TeamNameHistoryInfo(models.Model):
+    commit = models.ForeignKey(CompanyCommit, on_delete=models.CASCADE, related_name='team_name_histories')
+    name = models.CharField(max_length=255)
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='name_histories')
+
+    class Meta:
+        db_table = 'team_name_history'
+
+class TeamParentHistoryInfo(models.Model):
+    commit = models.ForeignKey(CompanyCommit, on_delete=models.CASCADE, related_name='team_parent_histories')
+    parent_team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='subteam_histories')
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='parent_histories')
+
+    class Meta:
+        db_table = 'team_parent_history'
