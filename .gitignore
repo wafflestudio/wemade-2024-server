@@ -271,3 +271,6 @@ fabric.properties
 .elasticbeanstalk/
 
 person/fixtures/personal_info.json
+
+## Do not add migrations in git
+**/migrations/0*.py
