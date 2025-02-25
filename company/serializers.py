@@ -10,7 +10,7 @@ from personCard.serializers import RoleSupervisorHistorySerializer
 class CorpListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Corporation
-        fields = ["c_id", "name", "sub_teams", "is_active"]
+        fields = ["c_id", "name", "sub_teams", "is_active", "is_master"]
 
 
 class CorpDetailSerializer(serializers.ModelSerializer):
@@ -27,13 +27,13 @@ class CorpDetailSerializer(serializers.ModelSerializer):
 class CorpCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Corporation
-        fields = ["name", "sub_teams", "is_active"]
+        fields = ["name", "sub_teams", "is_active", "is_master"]
 
 
 class CorpEditUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Corporation
-        fields = ["name", "sub_teams", "is_active"]
+        fields = ["name", "sub_teams", "is_active", "is_master"]
 
     def deactivate_corporation_recursive(self, corp_obj):
         from django.utils import timezone
