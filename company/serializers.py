@@ -33,7 +33,7 @@ class CorpCreateSerializer(serializers.ModelSerializer):
 class CorpEditUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Corporation
-        fields = ["name", "sub_teams", "is_active", "is_master"]
+        fields = ["name", "sub_teams", "is_active", "is_master", "hr_team"]
 
     def deactivate_corporation_recursive(self, corp_obj):
         from django.utils import timezone

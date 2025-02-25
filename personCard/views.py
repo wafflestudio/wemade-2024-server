@@ -11,11 +11,10 @@ from rest_framework.permissions import AllowAny
 
 from rest_condition import Or
 
-from person.models import Person, PersonalInfo
-from company.models import Role
+from company.permissions import IsMasterHRTeam
 from .serializers import *
 from .paginations import *
-from .permissions import *
+from .permissions import IsOwnerOrHRTeam, IsOwnerOrHRTeamOrTeamLeader
 
 
 # 검색 페이지에서 모든 사람 정보 불러오기
