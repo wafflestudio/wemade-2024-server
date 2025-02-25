@@ -75,6 +75,10 @@ class Team(models.Model):
 
 
 class Role(models.Model):
+    class RoleType(models.TextChoices):
+        EMPLOYEE = "부서원"
+        HEAD = "부서장"
+
     r_id = models.BigAutoField(primary_key=True)
     person = models.ForeignKey(
         "person.Person", on_delete=models.CASCADE, related_name="roles"
@@ -93,7 +97,7 @@ class Role(models.Model):
         blank=True,
         related_name="supervised_roles",
     )
-    role_name = models.CharField(max_length=50, null=True, blank=True)
+    role_name = models.CharField(max_length=50, null=True, blank=True, choices=RoleType.choices)
     start_date = models.DateTimeField(null=True, blank=True)
     end_date = models.DateTimeField(null=True, blank=True)
     job_description = models.TextField(null=True, blank=True)

@@ -8,6 +8,7 @@ from rest_framework.generics import (
 from rest_framework.permissions import AllowAny
 
 from rest_condition import Or
+from rest_framework.response import Response
 
 from .models import Corporation, Team
 from .serializers import *
@@ -69,10 +70,21 @@ class RoleCreateAPIView(CreateAPIView):
 
 # 특정한 사람의 role 변경 (직급 변경)
 class RoleUpdateAPIView(RetrieveUpdateAPIView):
+    lookup_field = "r_id"
+    lookup_url_kwarg = "r_id"
     queryset = Role.objects.all()
     serializer_class = RoleUpdateSerializer
     permission_classes = [Or(IsMasterHRTeam, IsHRTeam)]
 
+class RoleListDetailAPIView(ListAPIView):
+    serializer_class = RoleDetailSerializer
+    permission_classes = [Or(IsMasterHRTeam, IsHRTeam)]
+    lookup_field = 'person_id'
+    lookup_url_kwarg = 'p_id'
+
+    def get_queryset(self):
+        person_id = self.kwargs.get(self.lookup_url_kwarg)
+        return Role.objects.filter(person_id=person_id, end_date__isnull=True)
 
 # # 직무 업데이트 (HR Team) + 직무 히스토리 생성
 # class PersonRolesUpdateAPIView(RetrieveUpdateAPIView):
@@ -243,19 +255,22 @@ class TeamDeleteAPIView(RetrieveDestroyAPIView):
 # ----- Role Views -----
 class RoleDeleteAPIView(RetrieveDestroyAPIView):
     serializer_class = RoleDetailSerializer
-    queryset = Corporation.objects.all()
+    queryset = Role.objects.all()
     lookup_field = "r_id"
     lookup_url_kwarg = "r_id"
     permission_classes = [IsMasterHRTeam]
 
     def perform_destroy(self, instance):
         # 소프트 딜리트: is_active를 False로 변경하고, deleted_at을 기록
-        if not instance.deleted_at:
-            instance.deleted_at = timezone.now()
+        if not instance.end_date:
+            instance.end_date = timezone.now()
             instance.save()
         else:
-            # 이미 delete 상태라면 실제 삭제
-            instance.delete()
+            # 이미 delete 상태라면 실제 삭제?
+            # instance.delete()
+            # 실제 삭제는 안해야할듯
+            pass
+        print(instance.end_date)
 
 
 # --- Commit Views ---

@@ -14,11 +14,6 @@ class CorpListSerializer(serializers.ModelSerializer):
 
 
 class CorpDetailSerializer(serializers.ModelSerializer):
-    sub_teams = CorpListSerializer(
-        many=True, read_only=True, source="corporation_sub_teams"
-    )
-    hr_team = CorpListSerializer(read_only=True, source="corporation_hr_team")
-
     class Meta:
         model = Corporation
         fields = ["c_id", "name", "sub_teams", "hr_team", "is_active"]
@@ -535,10 +530,9 @@ class RoleUpdateSerializer(serializers.ModelSerializer):
       - 새 role의 supervisor는 새 role이 "부서장"이면 상위 팀의 팀리더로, 그렇지 않으면 기본적으로 팀의 team_leader로 설정합니다.
       - 새 role의 is_HR 여부는 팀이 속한 법인의 hr_team과 해당 팀이 일치하면 자동으로 True로 설정합니다.
     """
-
     class Meta:
         model = Role
-        fields = ["role_name", "job_description", "is_HR"]
+        fields = ["team", "r_id", "role_name", "job_description", "is_HR"]
         # supervisor, start_date, end_date는 자동으로 처리됨
 
     def update(self, instance, validated_data):
@@ -559,6 +553,8 @@ class RoleUpdateSerializer(serializers.ModelSerializer):
             new_is_HR = True
         else:
             new_is_HR = False
+
+        print(instance)
 
         with transaction.atomic():
             # 1. 기존 Role 종료 (소프트 종료)
@@ -590,6 +586,7 @@ class RoleUpdateSerializer(serializers.ModelSerializer):
 
             new_role = Role.objects.create(**new_role_data)
 
+            print(old_role_name, new_role_name)
             # 3. 추가 로직: 이전 role이 "부서장"이고 새 role이 "부서장"이 아닌 경우
             if old_role_name == "부서장" and new_role_name != "부서장":
                 # (a) 팀의 team_leader 해제
@@ -617,6 +614,7 @@ class RoleUpdateSerializer(serializers.ModelSerializer):
                 new_role.supervisor = parent_team.team_leader if parent_team else None
                 new_role.save()
 
+        print(team_instance.team_leader)
         return new_role
 
 

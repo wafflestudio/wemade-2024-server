@@ -22,7 +22,7 @@ urlpatterns = [
     # ----- 인사이동 관련 -----
     # Role
     # 특정한 사람의 role 조회 (supervisor 변경 포함)
-    path("roles/<int:p_id>/", RoleUpdateAPIView.as_view(), name="role-get"),
+    path("roles/<int:p_id>/", RoleListDetailAPIView.as_view(), name="role-get"),
     # 특정한 사람의 role 생성 (부서 이동/발령)
     path("roles/<int:p_id>/create/", RoleCreateAPIView.as_view(), name="role-create"),
     # 특정한 사람의 role 변경 (직급 변경)
@@ -52,5 +52,5 @@ urlpatterns = [
     path("team/<int:t_id>/delete/", TeamDeleteAPIView.as_view(), name="team-delete"),
     # Role
     # Role 삭제
-    path("roles/<int:p_id>/delete/", RoleDeleteAPIView.as_view(), name="role-delete"),
+    path("roles/<int:p_id>/delete/<int:r_id>/", RoleDeleteAPIView.as_view(), name="role-delete"),
 ]
