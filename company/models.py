@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.utils import timezone
 
 class Corporation(models.Model):
     c_id = models.BigAutoField(primary_key=True)
@@ -25,8 +25,8 @@ class Team(models.Model):
 
     corporation = models.ForeignKey(Corporation, related_name='teams', on_delete=models.CASCADE, null=True, blank=True)
 
-    sub_teams = models.ManyToManyField('self', related_name='super_teams', symmetrical=False, null=True,  blank=True)
-    parent_teams = models.ManyToManyField('self', related_name='lower_teams', symmetrical=False, null=True, blank=True)
+    sub_teams = models.ManyToManyField('self', related_name='super_teams', symmetrical=False, blank=True)
+    parent_teams = models.ManyToManyField('self', related_name='lower_teams', symmetrical=False, blank=True)
 
     # 문자열 참조 사용
     members = models.ManyToManyField('person.Person', related_name='member_of_teams', blank=True)
