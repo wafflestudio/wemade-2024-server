@@ -1,5 +1,6 @@
 from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveUpdateDestroyAPIView
-from .models import PersonCardColumns, EmailDomain
+from personCard.models import PersonCardColumns
+from oauth.models import EmailDomain
 from .serializers import PersonCardColumnsSerializer, EmailDomainSerializer
 from company.permissions import IsMasterHRTeam
 

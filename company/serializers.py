@@ -1,7 +1,8 @@
 from django.utils import timezone
 from rest_framework import serializers
-from .models import Corporation, Team, Role
+from .models import Corporation, Team, Role, RoleSupervisorHistory
 from person.models import Person
+from django.db import transaction
 
 # ----- Corporation Serializers -----
 class CorpListSerializer(serializers.ModelSerializer):
@@ -11,8 +12,8 @@ class CorpListSerializer(serializers.ModelSerializer):
 
 
 class CorpDetailSerializer(serializers.ModelSerializer):
-    sub_teams = TeamListSerializer(many=True, read_only=True, source='corporation_sub_teams')
-    hr_team = TeamListSerializer(read_only=True, source='corporation_hr_team')
+    sub_teams = CorpListSerializer(many=True, read_only=True, source='corporation_sub_teams')
+    hr_team = CorpListSerializer(read_only=True, source='corporation_hr_team')
 
     class Meta:
         model = Corporation
@@ -42,7 +43,7 @@ class CorpEditUpdateSerializer(serializers.ModelSerializer):
             # 소속 팀들 비활성화
             for team in corp_obj.teams.all():
                 if team.is_active:
-                    deactivate_team_recursive(team)
+                    TeamEditUpdateSerializer.deactivate_team_recursive(team)
 
     def update(self, instance, validated_data):
         from django.utils import timezone
@@ -139,7 +140,7 @@ class TeamCreateSerializer(serializers.ModelSerializer):
         members = validated_data.pop('members', [])
 
         # # 같은 corporation에 속한 활성 팀 중 동일한 이름이 존재하는지 확인
-        # corporation = validated_data.get('corporation')
+        corporation = validated_data.get('corporation')
         # name = validated_data.get('name')
         # if corporation and Team.objects.filter(corporation=corporation, name=name, is_active=True).exists():
         #     raise serializers.ValidationError("같은 corporation 내에 활성 상태의 동일한 이름의 팀이 이미 존재합니다.")
@@ -190,7 +191,7 @@ class TeamEditUpdateSerializer(serializers.ModelSerializer):
         # 하위 팀(lower_teams)들도 동일하게 비활성화 처리
         for child in team_obj.lower_teams.all():
             if child.is_active:
-                deactivate_team_recursive(child)
+                self.deactivate_team_recursive(child)
 
 
     def update(self, instance, validated_data):

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from person_card_columns.models import PersonCardColumns
+from personCard.models import PersonCardColumns
 
 
 class PersonCardInfoValidator:

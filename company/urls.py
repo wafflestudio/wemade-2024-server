@@ -1,5 +1,4 @@
 from django.urls import path, include
-from rest_framework import urls
 from .views import *
 
 urlpatterns = [
@@ -7,21 +6,21 @@ urlpatterns = [
     # Edit mode
     path('edit/', EditListAPIView.as_view(), name='edit-list'),
     # Subteam들 정보 불러오기
-    path('edit/team/<int:t_id>/'),
+    path('edit/team/<int:t_id>/', TeamEditListAPIView.as_view(), name='team-edit-list'),
     # Corporation 정보 업데이트 - 조직 이동/비활성화 (Master)
-    path('edit/corp/<int:c_id>/update/', CorpEditUpdateAPIView.as_view(), name='corp-update'),
+    path('edit/corp/<int:c_id>/update/', CorpEditUpdateDeleteAPIView.as_view(), name='corp-update'),
     # Team 정보 업데이트(1) - 조직 이동/비활성화 (Master/HR Team)
-    path('edit/team/<int:t_id>/update/', TeamEditUpdateAPIView.as_view(), name='team-update'),
+    path('edit/team/<int:t_id>/update/', TeamEditUpdateDeleteAPIView.as_view(), name='team-update'),
 
 
     # ----- 인사이동 관련 -----
     # Role
     # 특정한 사람의 role 조회 (supervisor 변경 포함)
-    path('roles/<int:p_id>/', ),
+    path('roles/<int:p_id>/', RoleUpdateAPIView.as_view(), name='role-get'),
     # 특정한 사람의 role 생성 (부서 이동/발령)
     path('roles/<int:p_id>/create/', RoleCreateAPIView.as_view(), name='role-create'),
     # 특정한 사람의 role 변경 (직급 변경)
-    path('roles/<int:p_id>/update/<int:r_id>/',),
+    path('roles/<int:p_id>/update/<int:r_id>/',RoleUpdateAPIView.as_view(), name='role-update'),
 
 
     # ----- 추가 기능 (MasterHR) -----

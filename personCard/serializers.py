@@ -2,7 +2,7 @@ from rest_framework import serializers
 from person.models import Person, PersonalInfo, PersonCardInfo, PersonalHistory
 from company.models import Role, RoleSupervisorHistory
 from django.utils import timezone
-
+from .validators import PersonCardInfoValidator
 
 class PersonCardListSerializer(serializers.ModelSerializer):
     emails = serializers.SerializerMethodField()
