@@ -89,7 +89,7 @@ class RoleUpdateAPIView(RetrieveUpdateAPIView):
 # 새로운 Corporation 생성
 class CorpCreateAPIView(CreateAPIView):
     serializer_class = CorpCreateSerializer
-    permission_class = [IsMasterHRTeam]
+    permission_classes = [IsMasterHRTeam]
 
 
 # 모든 Corporation List
