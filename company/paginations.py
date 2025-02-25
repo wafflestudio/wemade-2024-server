@@ -10,7 +10,3 @@ class CorpListPagination(CursorPagination):
 class TeamListPagination(CursorPagination):
     page_size = 10
     ordering = 't_id'
-
-class CommitListPagination(CursorPagination):
-    page_size = 10
-    ordering = 'commit_id'
