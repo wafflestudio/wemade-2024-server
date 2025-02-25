@@ -62,7 +62,6 @@ class PersonalInfoUpdateSerializer(serializers.ModelSerializer):
 
     # 공개 정보는 p_info JSON에 저장
     p_info = serializers.JSONField(
-        source='p_info',
         required=False,
         allow_null=True,
         validators=[validate_public_info]
@@ -121,7 +120,6 @@ class RoleHistorySerializer(serializers.ModelSerializer):
     supervisor_history = RoleSupervisorHistorySerializer(
         many=True,
         read_only=True,
-        source='supervisor_history'
     )
 
     # team, supervisor 필드 등 추가

@@ -3,6 +3,7 @@ from rest_framework import serializers
 from .models import Corporation, Team, Role, RoleSupervisorHistory
 from person.models import Person
 from django.db import transaction
+from personCard.serializers import RoleSupervisorHistorySerializer
 
 # ----- Corporation Serializers -----
 class CorpListSerializer(serializers.ModelSerializer):
@@ -572,30 +573,12 @@ class RoleUpdateSerializer(serializers.ModelSerializer):
         return new_role
 
 
-class RoleSupervisorHistorySerializer(serializers.ModelSerializer):
-    old_supervisor_id = serializers.IntegerField(source='old_supervisor.p_id', read_only=True)
-    old_supervisor_name = serializers.CharField(source='old_supervisor.name', read_only=True)
-    new_supervisor_id = serializers.IntegerField(source='new_supervisor.p_id', read_only=True)
-    new_supervisor_name = serializers.CharField(source='new_supervisor.name', read_only=True)
-
-    class Meta:
-        model = RoleSupervisorHistory
-        fields = [
-            'id', #RoleSupervisorHistory id
-            'old_supervisor_id',
-            'old_supervisor_name',
-            'new_supervisor_id',
-            'new_supervisor_name',
-            'changed_at',
-        ]
-
 # 직무 히스토리 정보 불러오기
 class RoleDetailSerializer(serializers.ModelSerializer):
     # Nested: supervisor_history
     supervisor_history = RoleSupervisorHistorySerializer(
         many=True,
         read_only=True,
-        source='supervisor_history'
     )
 
     # team, supervisor 필드 등 추가
