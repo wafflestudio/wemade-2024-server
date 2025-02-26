@@ -4,9 +4,9 @@ from .models import *
 
 class CorpListPagination(CursorPagination):
     page_size = 10
-    ordering = 'c_id'
+    ordering = "c_id"
 
 
 class TeamListPagination(CursorPagination):
     page_size = 10
-    ordering = 't_id'
+    ordering = "t_id"

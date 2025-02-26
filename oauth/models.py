@@ -2,6 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from person.models import Person
 
+
 class OauthInfo(AbstractUser):
     person = models.ForeignKey(Person, on_delete=models.SET_NULL, null=True)
     username = models.CharField(max_length=255, unique=True)
@@ -14,9 +15,9 @@ class OauthInfo(AbstractUser):
         return self.email
 
     class Meta:
-        db_table = 'oauth_info'
-        
-        
+        db_table = "oauth_info"
+
+
 class EmailDomain(models.Model):
     domain = models.CharField(max_length=255)
 
@@ -24,4 +25,4 @@ class EmailDomain(models.Model):
         return self.domain
 
     class Meta:
-        db_table = 'email_domain'
+        db_table = "email_domain"
