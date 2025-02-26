@@ -14,7 +14,9 @@ class PersonCardListSerializer(serializers.ModelSerializer):
     roles = serializers.SerializerMethodField()
 
     def get_corporations(self, obj):
-        return list(set(team.corporation.commit_id for team in obj.member_of_teams.all()))
+        return list(
+            set(team.corporation.commit_id for team in obj.member_of_teams.all())
+        )
 
     def get_teams(self, obj):
         return [team.t_id for team in obj.member_of_teams.all()]

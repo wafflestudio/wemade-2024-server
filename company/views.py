@@ -8,7 +8,8 @@ from rest_framework.generics import (
     CreateAPIView,
     RetrieveAPIView,
     RetrieveUpdateAPIView,
-    RetrieveDestroyAPIView, get_object_or_404,
+    RetrieveDestroyAPIView,
+    get_object_or_404,
 )
 from rest_framework.permissions import AllowAny
 
@@ -65,8 +66,18 @@ class CorpUpdateAPIView(RetrieveUpdateAPIView):
 
         instance = serializer.save()
         if "name" in serializer.validated_data:
-            CorporationNameHistoryInfo.objects.create(corporation=instance, name=instance.name, commit=commit)
-            commit.actions.add(CompanyCommitAction.objects.create(commit=commit, target_type="CORPORATION", action="UPDATE", target_id=instance.c_id, new_name=instance.name))
+            CorporationNameHistoryInfo.objects.create(
+                corporation=instance, name=instance.name, commit=commit
+            )
+            commit.actions.add(
+                CompanyCommitAction.objects.create(
+                    commit=commit,
+                    target_type="CORPORATION",
+                    action="UPDATE",
+                    target_id=instance.c_id,
+                    new_name=instance.name,
+                )
+            )
 
 
 # Team 정보 업데이트 (Master/HR Team)
@@ -86,11 +97,33 @@ class TeamUpdateAPIView(RetrieveUpdateAPIView):
 
         instance = serializer.save()
         if "name" in serializer.validated_data:
-            TeamNameHistoryInfo.objects.create(team=instance, name=instance.name, commit=commit)
-            commit.actions.add(CompanyCommitAction.objects.create(commit=commit, target_type="TEAM", action="UPDATE", target_id=instance.t_id, new_name=instance.name))
+            TeamNameHistoryInfo.objects.create(
+                team=instance, name=instance.name, commit=commit
+            )
+            commit.actions.add(
+                CompanyCommitAction.objects.create(
+                    commit=commit,
+                    target_type="TEAM",
+                    action="UPDATE",
+                    target_id=instance.t_id,
+                    new_name=instance.name,
+                )
+            )
         if "parent_teams" in serializer.validated_data:
-            TeamParentHistoryInfo.objects.create(team=instance, parent_team=instance.parent_teams.first(), commit=commit)
-            commit.actions.add(CompanyCommitAction.objects.create(commit=commit, target_type="TEAM", action="UPDATE", target_id=instance.t_id, new_parent_id=instance.parent_teams.first().t_id if instance.parent_teams.first() else None))
+            TeamParentHistoryInfo.objects.create(
+                team=instance, parent_team=instance.parent_teams.first(), commit=commit
+            )
+            commit.actions.add(
+                CompanyCommitAction.objects.create(
+                    commit=commit,
+                    target_type="TEAM",
+                    action="UPDATE",
+                    target_id=instance.t_id,
+                    new_parent_id=instance.parent_teams.first().t_id
+                    if instance.parent_teams.first()
+                    else None,
+                )
+            )
 
 
 # --------- 인사 이동 관련 Views ------------
@@ -149,7 +182,16 @@ class CorpCreateAPIView(CreateAPIView):
         CorporationNameHistoryInfo.objects.create(
             corporation=corporation, name=corporation.name, commit=commit
         )
-        commit.actions.add(CompanyCommitAction.objects.create(commit=commit, target_type="CORPORATION", action="CREATE", target_id=corporation.commit_id, new_name=corporation.name))
+        commit.actions.add(
+            CompanyCommitAction.objects.create(
+                commit=commit,
+                target_type="CORPORATION",
+                action="CREATE",
+                target_id=corporation.commit_id,
+                new_name=corporation.name,
+            )
+        )
+
 
 # 모든 Corporation List
 class CorpListAPIView(ListAPIView):
@@ -173,7 +215,6 @@ class CorpDetailAPIView(RetrieveAPIView):
     permission_classes = [AllowAny]
 
 
-
 class CorpDeleteAPIView(RetrieveDestroyAPIView):
     serializer_class = CorpDetailSerializer
     queryset = Corporation.objects.all()
@@ -183,17 +224,19 @@ class CorpDeleteAPIView(RetrieveDestroyAPIView):
 
     def perform_destroy(self, instance):
         """
-       1) instance.is_active = False, deleted_at=now() → Corporation 소프트 딜리트
-       2) 해당 Corporation에 속한 모든 Team(과 하위 조직)도 Deactivate
-       3) 그 팀들에 연결된 Role 모두 end_date 처리
-       """
+        1) instance.is_active = False, deleted_at=now() → Corporation 소프트 딜리트
+        2) 해당 Corporation에 속한 모든 Team(과 하위 조직)도 Deactivate
+        3) 그 팀들에 연결된 Role 모두 end_date 처리
+        """
         new_commit = self.request.data.get("new_commit", False)
         if new_commit:
             commit = CompanyCommit.objects.create()
         else:
             commit = CompanyCommit.objects.latest("created_at")
 
-        CorporationNameHistoryInfo.objects.create(corporation=instance, name="", commit=commit)
+        CorporationNameHistoryInfo.objects.create(
+            corporation=instance, name="", commit=commit
+        )
 
         if instance.is_active:
             instance.is_active = False
@@ -203,7 +246,14 @@ class CorpDeleteAPIView(RetrieveDestroyAPIView):
             teams = instance.teams.all()
             for team in teams:
                 self.deactivate_team_recursive(team, commit)
-            commit.actions.add(CompanyCommitAction.objects.create(commit=commit, target_type="CORPORATION", action="DELETE", target_id=instance.commit_id))
+            commit.actions.add(
+                CompanyCommitAction.objects.create(
+                    commit=commit,
+                    target_type="CORPORATION",
+                    action="DELETE",
+                    target_id=instance.commit_id,
+                )
+            )
         else:
             # instance.delete()
             pass
@@ -234,8 +284,22 @@ class TeamCreateAPIView(CreateAPIView):
         team = serializer.save()
         TeamNameHistoryInfo.objects.create(team=team, name=team.name, commit=commit)
         if team.parent_teams:
-            TeamParentHistoryInfo.objects.create(team=team, parent_team=team.parent_teams.first(), commit=commit)
-        commit.actions.add(CompanyCommitAction.objects.create(commit=commit, target_type="TEAM", action="CREATE", target_id=team.t_id, new_name=team.name, new_parent_id=team.parent_teams.first().t_id if team.parent_teams.first() else None))
+            TeamParentHistoryInfo.objects.create(
+                team=team, parent_team=team.parent_teams.first(), commit=commit
+            )
+        commit.actions.add(
+            CompanyCommitAction.objects.create(
+                commit=commit,
+                target_type="TEAM",
+                action="CREATE",
+                target_id=team.t_id,
+                new_name=team.name,
+                new_parent_id=team.parent_teams.first().t_id
+                if team.parent_teams.first()
+                else None,
+            )
+        )
+
 
 # 모든 Team List
 class TeamListAPIView(ListAPIView):
@@ -274,7 +338,9 @@ class TeamDeleteAPIView(RetrieveDestroyAPIView):
             commit = CompanyCommit.objects.latest("created_at")
 
         TeamNameHistoryInfo.objects.create(team=instance, name="", commit=commit)
-        TeamParentHistoryInfo.objects.create(team=instance, parent_team=None, commit=commit)
+        TeamParentHistoryInfo.objects.create(
+            team=instance, parent_team=None, commit=commit
+        )
 
         if instance.is_active:
             instance.is_active = False
@@ -283,7 +349,14 @@ class TeamDeleteAPIView(RetrieveDestroyAPIView):
             instance.save()
             for child_team in instance.sub_teams.all():
                 self.deactivate_subteams_recursive(child_team, commit)
-            commit.actions.add(CompanyCommitAction.objects.create(commit=commit, target_type="CORPORATION", action="DELETE", target_id=instance.commit_id))
+            commit.actions.add(
+                CompanyCommitAction.objects.create(
+                    commit=commit,
+                    target_type="CORPORATION",
+                    action="DELETE",
+                    target_id=instance.commit_id,
+                )
+            )
         else:
             # instance.delete()
             # Do not delete permanently
@@ -295,7 +368,9 @@ class TeamDeleteAPIView(RetrieveDestroyAPIView):
         """
         if team_obj.is_active:
             TeamNameHistoryInfo.objects.create(team=team_obj, name="", commit=commit)
-            TeamParentHistoryInfo.objects.create(team=team_obj, parent_team=None, commit=commit)
+            TeamParentHistoryInfo.objects.create(
+                team=team_obj, parent_team=None, commit=commit
+            )
             team_obj.is_active = False
             team_obj.deleted_at = timezone.now()
             team_obj.save()
@@ -326,6 +401,7 @@ class RoleDeleteAPIView(RetrieveDestroyAPIView):
 
 # --- Commit Views ---
 
+
 class CorpRestoreView(RetrieveAPIView):
     serializer_class = CorpRestoreSerializer
     queryset = Corporation.objects.all()
@@ -337,23 +413,27 @@ class CorpRestoreView(RetrieveAPIView):
         corporation = get_object_or_404(Corporation, c_id=c_id)
 
         name_history = (
-            CorporationNameHistoryInfo.objects.filter(corporation=corporation, commit__commit_id__lte=commit.commit_id)
+            CorporationNameHistoryInfo.objects.filter(
+                corporation=corporation, commit__commit_id__lte=commit.commit_id
+            )
             .order_by("-commit__commit_id")
             .first()
         )
         if name_history:
             corporation.name = name_history.name
 
-        latest_commit_per_team = TeamParentHistoryInfo.objects.filter(
-            team=OuterRef('team'),
-            commit__commit_id__lte=commit.commit_id
-        ).values('team').annotate(
-            max_commit_id=Max('commit__commit_id')
-        ).values('max_commit_id')
+        latest_commit_per_team = (
+            TeamParentHistoryInfo.objects.filter(
+                team=OuterRef("team"), commit__commit_id__lte=commit.commit_id
+            )
+            .values("team")
+            .annotate(max_commit_id=Max("commit__commit_id"))
+            .values("max_commit_id")
+        )
 
         parent_history = TeamParentHistoryInfo.objects.filter(
             commit__commit_id=Subquery(latest_commit_per_team),
-        ).distinct('team')
+        ).distinct("team")
 
         sub_teams = []
         for h in parent_history.filter(parent_team=None).all():
@@ -366,6 +446,7 @@ class CorpRestoreView(RetrieveAPIView):
         serializer = self.get_serializer(corporation_copy, commit=commit)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
 class TeamRestoreView(RetrieveAPIView):
     serializer_class = TeamRestoreSerializer
     queryset = Team.objects.all()
@@ -377,23 +458,27 @@ class TeamRestoreView(RetrieveAPIView):
         team = get_object_or_404(Team, t_id=t_id)
 
         name_history = (
-            TeamNameHistoryInfo.objects.filter(team=team, commit__created_at__lte=commit.created_at)
+            TeamNameHistoryInfo.objects.filter(
+                team=team, commit__created_at__lte=commit.created_at
+            )
             .order_by("-commit__commit_id")
             .first()
         )
         if name_history:
             team.name = name_history.name
 
-        latest_commit_per_team = TeamParentHistoryInfo.objects.filter(
-            team=OuterRef('team'),
-            commit__commit_id__lte=commit.commit_id
-        ).values('team').annotate(
-            max_commit_id=Max('commit__commit_id')
-        ).values('max_commit_id')
+        latest_commit_per_team = (
+            TeamParentHistoryInfo.objects.filter(
+                team=OuterRef("team"), commit__commit_id__lte=commit.commit_id
+            )
+            .values("team")
+            .annotate(max_commit_id=Max("commit__commit_id"))
+            .values("max_commit_id")
+        )
 
         parent_history = TeamParentHistoryInfo.objects.filter(
             commit__commit_id=Subquery(latest_commit_per_team),
-        ).distinct('team')
+        ).distinct("team")
 
         sub_teams = []
         for h in parent_history.filter(parent_team=team).all():
@@ -406,10 +491,12 @@ class TeamRestoreView(RetrieveAPIView):
         serializer = self.get_serializer(team_copy, commit=commit)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
 class CompanyCommitListView(ListAPIView):
     serializer_class = CompanyCommitSerializer
     queryset = CompanyCommit.objects.all().order_by("-created_at")
     permission_classes = [Or(IsMasterHRTeam, IsHRTeam)]
+
 
 class CurrentCommitView(APIView):
     permission_classes = [Or(IsMasterHRTeam, IsHRTeam)]

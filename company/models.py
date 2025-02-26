@@ -165,6 +165,7 @@ class CompanyCommitAction(models.Model):
         CREATE = "CREATE"
         UPDATE = "UPDATE"
         DELETE = "DELETE"
+
     class TargetType(models.TextChoices):
         CORPORATION = "corporation"
         TEAM = "team"
@@ -176,12 +177,13 @@ class CompanyCommitAction(models.Model):
         max_length=50, choices=CommitType.choices, default=CommitType.CREATE
     )
 
-    target_type = models.CharField(max_length=50, choices=TargetType.choices, default=TargetType.TEAM)
+    target_type = models.CharField(
+        max_length=50, choices=TargetType.choices, default=TargetType.TEAM
+    )
     create_new_info = models.JSONField(null=True, blank=True)
     new_parent_id = models.BigIntegerField(null=True, blank=True)
     target_id = models.BigIntegerField(null=True, blank=True)
     new_name = models.CharField(max_length=255, null=True, blank=True)
-
 
     created_at = models.DateTimeField(auto_now_add=True)
 

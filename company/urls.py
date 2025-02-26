@@ -58,8 +58,16 @@ urlpatterns = [
         name="role-delete",
     ),
     # Commit Restore
-    path("restore/corp/<int:commit_id>/<int:c_id>/", CorpRestoreView.as_view(), name="corp-restore"),
-    path("restore/team/<int:commit_id>/<int:t_id>/", TeamRestoreView.as_view(), name="team-restore"),
+    path(
+        "restore/corp/<int:commit_id>/<int:c_id>/",
+        CorpRestoreView.as_view(),
+        name="corp-restore",
+    ),
+    path(
+        "restore/team/<int:commit_id>/<int:t_id>/",
+        TeamRestoreView.as_view(),
+        name="team-restore",
+    ),
     path("commit/list/", CompanyCommitListView.as_view(), name="commit-list"),
     path("commit/latest/", CurrentCommitView.as_view(), name="commit-list"),
 ]

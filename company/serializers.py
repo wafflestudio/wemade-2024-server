@@ -1,7 +1,14 @@
 from django.utils import timezone
 from rest_framework import serializers
-from .models import Corporation, Team, Role, TeamParentHistoryInfo, TeamNameHistoryInfo, CorporationNameHistoryInfo, \
-    CompanyCommit, CompanyCommitAction
+from .models import (
+    Corporation,
+    Team,
+    Role,
+    TeamParentHistoryInfo,
+    CorporationNameHistoryInfo,
+    CompanyCommit,
+    CompanyCommitAction,
+)
 from person.models import Person
 from django.db import transaction
 from personCard.serializers import RoleSupervisorHistorySerializer
@@ -657,6 +664,7 @@ class RoleDetailSerializer(serializers.ModelSerializer):
             "supervisor_history",
         ]
 
+
 # 조직도 과거 기록 조회
 
 
@@ -664,7 +672,9 @@ class TeamRestoreSerializer(serializers.ModelSerializer):
     corporation = CorpDetailSerializer(read_only=True)
     sub_teams = TeamListSerializer(many=True, read_only=True, source="lower_teams")
     parent_teams = serializers.SerializerMethodField()
-    members = serializers.PrimaryKeyRelatedField(many=True, queryset=Person.objects.all())
+    members = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=Person.objects.all()
+    )
     team_leader = serializers.PrimaryKeyRelatedField(queryset=Person.objects.all())
     member_count = serializers.SerializerMethodField()
 
@@ -695,11 +705,17 @@ class TeamRestoreSerializer(serializers.ModelSerializer):
 
         while current_team.parent_teams.exists():
             parent_history = (
-                TeamParentHistoryInfo.objects.filter(team=current_team, commit__created_at__lte=self.commit.created_at)
+                TeamParentHistoryInfo.objects.filter(
+                    team=current_team, commit__created_at__lte=self.commit.created_at
+                )
                 .order_by("-commit__created_at")
                 .first()
             )
-            parent_team = parent_history.parent_team if parent_history else current_team.parent_teams.first()
+            parent_team = (
+                parent_history.parent_team
+                if parent_history
+                else current_team.parent_teams.first()
+            )
 
             if not parent_team:
                 break
@@ -715,6 +731,7 @@ class TeamRestoreSerializer(serializers.ModelSerializer):
 
     def get_member_count(self, obj):
         return obj.members.count()
+
 
 class CorpRestoreSerializer(serializers.ModelSerializer):
     sub_teams = TeamListSerializer(many=True, read_only=True)
@@ -733,7 +750,9 @@ class CorpRestoreSerializer(serializers.ModelSerializer):
         # 특정 commit 시점에서의 법인 이름 복원
         if self.commit:
             name_history = (
-                CorporationNameHistoryInfo.objects.filter(corporation=instance, commit__created_at__lte=self.commit.created_at)
+                CorporationNameHistoryInfo.objects.filter(
+                    corporation=instance, commit__created_at__lte=self.commit.created_at
+                )
                 .order_by("-commit__created_at")
                 .first()
             )
@@ -742,14 +761,24 @@ class CorpRestoreSerializer(serializers.ModelSerializer):
 
         return data
 
+
 class CompanyCommitActionSerializer(serializers.ModelSerializer):
     class Meta:
         model = CompanyCommitAction
-        fields = ["action", "target_type", "create_new_info", "new_parent_id", "target_id", "new_name", "created_at"]
+        fields = [
+            "action",
+            "target_type",
+            "create_new_info",
+            "new_parent_id",
+            "target_id",
+            "new_name",
+            "created_at",
+        ]
+
 
 class CompanyCommitSerializer(serializers.ModelSerializer):
     actions = CompanyCommitActionSerializer(many=True, read_only=True)
+
     class Meta:
         model = CompanyCommit
         fields = ["commit_id", "created_at", "message", "actions"]
-
