@@ -10,13 +10,13 @@ urlpatterns = [
     # Corporation 정보 업데이트 - 조직 이동/비활성화 (Master)
     path(
         "edit/corp/<int:c_id>/update/",
-        CorpEditUpdateDeleteAPIView.as_view(),
+        CorpUpdateAPIView.as_view(),
         name="corp-update",
     ),
     # Team 정보 업데이트(1) - 조직 이동/비활성화 (Master/HR Team)
     path(
         "edit/team/<int:t_id>/update/",
-        TeamEditUpdateDeleteAPIView.as_view(),
+        TeamUpdateAPIView.as_view(),
         name="team-update",
     ),
     # ----- 인사이동 관련 -----
@@ -52,5 +52,14 @@ urlpatterns = [
     path("team/<int:t_id>/delete/", TeamDeleteAPIView.as_view(), name="team-delete"),
     # Role
     # Role 삭제
-    path("roles/<int:p_id>/delete/<int:r_id>/", RoleDeleteAPIView.as_view(), name="role-delete"),
+    path(
+        "roles/<int:p_id>/delete/<int:r_id>/",
+        RoleDeleteAPIView.as_view(),
+        name="role-delete",
+    ),
+    # Commit Restore
+    path("restore/corp/<int:commit_id>/<int:c_id>/", CorpRestoreView.as_view(), name="corp-restore"),
+    path("restore/team/<int:commit_id>/<int:t_id>/", TeamRestoreView.as_view(), name="team-restore"),
+    path("commit/list/", CompanyCommitListView.as_view(), name="commit-list"),
+    path("commit/latest/", CurrentCommitView.as_view(), name="commit-list"),
 ]

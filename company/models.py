@@ -97,7 +97,9 @@ class Role(models.Model):
         blank=True,
         related_name="supervised_roles",
     )
-    role_name = models.CharField(max_length=50, null=True, blank=True, choices=RoleType.choices)
+    role_name = models.CharField(
+        max_length=50, null=True, blank=True, choices=RoleType.choices
+    )
     start_date = models.DateTimeField(null=True, blank=True)
     end_date = models.DateTimeField(null=True, blank=True)
     job_description = models.TextField(null=True, blank=True)
@@ -150,6 +152,8 @@ class RoleSupervisorHistory(models.Model):
 
 
 class CompanyCommit(models.Model):
+    commit_id = models.BigAutoField(primary_key=True)
+    message = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -161,6 +165,9 @@ class CompanyCommitAction(models.Model):
         CREATE = "CREATE"
         UPDATE = "UPDATE"
         DELETE = "DELETE"
+    class TargetType(models.TextChoices):
+        CORPORATION = "corporation"
+        TEAM = "team"
 
     commit = models.ForeignKey(
         CompanyCommit, on_delete=models.CASCADE, related_name="actions"
@@ -169,10 +176,12 @@ class CompanyCommitAction(models.Model):
         max_length=50, choices=CommitType.choices, default=CommitType.CREATE
     )
 
+    target_type = models.CharField(max_length=50, choices=TargetType.choices, default=TargetType.TEAM)
     create_new_info = models.JSONField(null=True, blank=True)
-    prev_parent_id = models.BigIntegerField(null=True, blank=True)
     new_parent_id = models.BigIntegerField(null=True, blank=True)
     target_id = models.BigIntegerField(null=True, blank=True)
+    new_name = models.CharField(max_length=255, null=True, blank=True)
+
 
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -213,10 +222,10 @@ class TeamParentHistoryInfo(models.Model):
         CompanyCommit, on_delete=models.CASCADE, related_name="team_parent_histories"
     )
     parent_team = models.ForeignKey(
-        Team, on_delete=models.CASCADE, related_name="subteam_histories"
+        Team, on_delete=models.CASCADE, related_name="subteam_histories", null=True
     )
     team = models.ForeignKey(
-        Team, on_delete=models.CASCADE, related_name="parent_histories"
+        Team, on_delete=models.CASCADE, related_name="parent_histories", null=True
     )
 
     class Meta:

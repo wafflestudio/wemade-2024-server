@@ -1,6 +1,7 @@
 from django.utils import timezone
 from rest_framework import serializers
-from .models import Corporation, Team, Role
+from .models import Corporation, Team, Role, TeamParentHistoryInfo, TeamNameHistoryInfo, CorporationNameHistoryInfo, \
+    CompanyCommit, CompanyCommitAction
 from person.models import Person
 from django.db import transaction
 from personCard.serializers import RoleSupervisorHistorySerializer
@@ -131,6 +132,7 @@ class TeamCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Team
         fields = [
+            "t_id",
             "name",
             "corporation",
             "sub_teams",
@@ -139,6 +141,7 @@ class TeamCreateSerializer(serializers.ModelSerializer):
             "team_leader",
             "is_active",
         ]
+        read_only_fields = ["t_id"]
 
     def create(self, validated_data):
         # ManyToManyField 분리
@@ -171,6 +174,11 @@ class TeamCreateSerializer(serializers.ModelSerializer):
 
 
 class TeamEditUpdateSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(required=False)
+    parent_teams = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=Team.objects.all(), required=False
+    )
+
     class Meta:
         model = Team
         fields = ["name", "corporation", "sub_teams", "parent_teams"]
@@ -530,6 +538,7 @@ class RoleUpdateSerializer(serializers.ModelSerializer):
       - 새 role의 supervisor는 새 role이 "부서장"이면 상위 팀의 팀리더로, 그렇지 않으면 기본적으로 팀의 team_leader로 설정합니다.
       - 새 role의 is_HR 여부는 팀이 속한 법인의 hr_team과 해당 팀이 일치하면 자동으로 True로 설정합니다.
     """
+
     class Meta:
         model = Role
         fields = ["team", "r_id", "role_name", "job_description", "is_HR"]
@@ -647,3 +656,100 @@ class RoleDetailSerializer(serializers.ModelSerializer):
             "is_HR",
             "supervisor_history",
         ]
+
+# 조직도 과거 기록 조회
+
+
+class TeamRestoreSerializer(serializers.ModelSerializer):
+    corporation = CorpDetailSerializer(read_only=True)
+    sub_teams = TeamListSerializer(many=True, read_only=True, source="lower_teams")
+    parent_teams = serializers.SerializerMethodField()
+    members = serializers.PrimaryKeyRelatedField(many=True, queryset=Person.objects.all())
+    team_leader = serializers.PrimaryKeyRelatedField(queryset=Person.objects.all())
+    member_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Team
+        fields = [
+            "t_id",
+            "name",
+            "corporation",
+            "sub_teams",
+            "parent_teams",
+            "team_leader",
+            "members",
+            "member_count",
+            "is_active",
+            "created_at",
+            "deleted_at",
+        ]
+
+    def __init__(self, *args, **kwargs):
+        self.commit = kwargs.pop("commit", None)
+        super().__init__(*args, **kwargs)
+
+    def get_parent_teams(self, obj):
+        parent_chain = []
+        current_team = obj
+        order = 0
+
+        while current_team.parent_teams.exists():
+            parent_history = (
+                TeamParentHistoryInfo.objects.filter(team=current_team, commit__created_at__lte=self.commit.created_at)
+                .order_by("-commit__created_at")
+                .first()
+            )
+            parent_team = parent_history.parent_team if parent_history else current_team.parent_teams.first()
+
+            if not parent_team:
+                break
+
+            serialized = TeamListSerializer(parent_team, context=self.context).data
+            serialized["order"] = order
+            parent_chain.append(serialized)
+
+            current_team = parent_team
+            order += 1
+
+        return parent_chain
+
+    def get_member_count(self, obj):
+        return obj.members.count()
+
+class CorpRestoreSerializer(serializers.ModelSerializer):
+    sub_teams = TeamListSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Corporation
+        fields = ["c_id", "name", "sub_teams", "hr_team", "is_active"]
+
+    def __init__(self, *args, **kwargs):
+        self.commit = kwargs.pop("commit", None)
+        super().__init__(*args, **kwargs)
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+
+        # 특정 commit 시점에서의 법인 이름 복원
+        if self.commit:
+            name_history = (
+                CorporationNameHistoryInfo.objects.filter(corporation=instance, commit__created_at__lte=self.commit.created_at)
+                .order_by("-commit__created_at")
+                .first()
+            )
+            if name_history:
+                data["name"] = name_history.name  # 과거 이름으로 변경
+
+        return data
+
+class CompanyCommitActionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CompanyCommitAction
+        fields = ["action", "target_type", "create_new_info", "new_parent_id", "target_id", "new_name", "created_at"]
+
+class CompanyCommitSerializer(serializers.ModelSerializer):
+    actions = CompanyCommitActionSerializer(many=True, read_only=True)
+    class Meta:
+        model = CompanyCommit
+        fields = ["commit_id", "created_at", "message", "actions"]
+
