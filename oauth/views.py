@@ -117,6 +117,7 @@ class GoogleLoginCallback(APIView):
                 "access_token": access_token,
                 "refresh_token": str(refresh),
                 "roles": roles_serialized,
+                "p_id": person.p_id
             },
             status=status.HTTP_200_OK,
         )
