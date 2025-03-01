@@ -36,6 +36,7 @@ ALLOWED_HOSTS = [
     "wemade-2024-server-h0csbcbdesdbe0ep.eastasia-01.azurewebsites.net",
     "localhost",
     "127.0.0.1",
+    "*"
 ]
 
 
