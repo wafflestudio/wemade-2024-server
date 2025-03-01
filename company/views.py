@@ -187,7 +187,7 @@ class CorpCreateAPIView(CreateAPIView):
                 commit=commit,
                 target_type="CORPORATION",
                 action="CREATE",
-                target_id=corporation.commit_id,
+                target_id=corporation.c_id,
                 new_name=corporation.name,
             )
         )
