@@ -29,6 +29,19 @@ urlpatterns = [
     ),
 
     # 조직도 임시저장
+    path(
+        "edit/draft/",
+        EditDraftAPIView.as_view(),
+        name="edit-draft"
+
+    ),
+    # 조직도 임시저장 삭제
+    path(
+        "edit/draft/delete/<int:d_id>",
+        EditDraftDeleteAPIView.as_view(),
+        name="edit-draft-delete"
+    ),
+
 
     # Commit Restore
     path(
