@@ -59,6 +59,7 @@ class EditDraftAPIView(ListCreateAPIView):
         user_person = self.request.user.person
         return Draft.objects.filter(created_by=user_person).order_by("created_at")
 
+
 # 임시저장 삭제
 class EditDraftDeleteAPIView(RetrieveDestroyAPIView):
     serializer_class = EditDraftSerializer
