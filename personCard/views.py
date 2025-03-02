@@ -72,16 +72,25 @@ class PersonCardChangeListAPIView(ListAPIView):
     permission_classes = [Or(IsMasterHRTeam, IsHRTeam)]
 
     def get_queryset(self):
-        qs = PersonCardChangeRequest.objects.filter(status='pending')
         user_person = self.request.user.person
+        c_id = self.kwargs.get("c_id")
 
-        # 만약 사용자가 MasterHRTeam이 아니라면, 자신이 관리하는 직원들의 요청만 필터링
-        if not IsMasterHRTeam().has_permission(self.request, self):
-            # 사용자가 속한 HR팀에 해당하는 법인의 구성원만 조회
-            qs = qs.filter(
-                person__member_of_teams__corporation__hr_team__members=user_person
-            )
-        return qs.distinct().order_by('requested_at')
+        # MasterHRTeam은 모든 요청을 볼 수 있음
+        if IsMasterHRTeam().has_permission(self.request, self):
+            if c_id:
+                return PersonCardChangeRequest.objects.filter(person__member_of_teams__corporation__c_id=c_id).distinct().order_by("requested_at")
+            return PersonCardChangeRequest.objects.all().order_by("requested_at")
+
+        # HR팀원이라면 해당 법인의 HR팀에 속해야 함
+        try:
+            corp = Corporation.objects.get(c_id=c_id)
+        except Corporation.DoesNotExist:
+            raise PermissionDenied("해당 Corporation이 존재하지 않습니다.")
+
+        if user_person not in corp.hr_team.members.all():
+            raise PermissionDenied("해당 법인의 HR팀원만 접근할 수 있습니다.")
+
+        return PersonCardChangeRequest.objects.filter(person__member_of_teams__corporation=corp).distinct().order_by("requested_at")
 
 
 # 개인정보 수정 허가

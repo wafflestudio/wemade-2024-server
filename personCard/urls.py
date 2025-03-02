@@ -22,7 +22,7 @@ urlpatterns = [
     ),
     # 개인정보 수정 요청 list (Master/HR Team)
     path(
-        "change-request/list/",
+        "change-request/list/<int:c_id>/",
         PersonCardChangeListAPIView.as_view(),
         name="persona-card-change-list"
     ),
