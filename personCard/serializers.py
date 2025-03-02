@@ -5,7 +5,7 @@ from .models import PersonCardChangeRequest
 from .validators import PersonCardInfoValidator
 
 
-RESTRICTED_FIELDS = ['main_phone_number', 'birthday', 'name']
+RESTRICTED_FIELDS = ["main_phone_number", "birthday", "name"]
 
 
 class PersonCardListSerializer(serializers.ModelSerializer):
@@ -139,8 +139,8 @@ class PersonalInfoUpdateSerializer(serializers.ModelSerializer):
                         field_name=field,
                         old_value=old_value,
                         new_value=new_value,
-                        status='pending',
-                        supporting_material = supporting_material
+                        status="pending",
+                        supporting_material=supporting_material,
                     )
                     change_requests.append(req)
 
@@ -161,8 +161,8 @@ class PersonalInfoUpdateSerializer(serializers.ModelSerializer):
                             column=column,
                             old_value=str(old_value),
                             new_value=str(new_value),
-                            status='pending',
-                            supporting_material=supporting_material
+                            status="pending",
+                            supporting_material=supporting_material,
                         )
                     # Do not immediately update
                 else:
@@ -187,8 +187,8 @@ class PersonalInfoUpdateSerializer(serializers.ModelSerializer):
                             column=column,
                             old_value=str(old_value),
                             new_value=str(new_value),
-                            status='pending',
-                            supporting_material=supporting_material
+                            status="pending",
+                            supporting_material=supporting_material,
                         )
                 else:
                     current_p_card_info[key] = new_value
@@ -209,8 +209,16 @@ class PersonCardChangeListSerializer(serializers.ModelSerializer):
     class Meta:
         model = PersonCardChangeRequest
         fields = [
-            'id', 'person', 'column', 'old_value', 'new_value', 'status',
-            'requested_at', 'reviewed_at', 'reviewed_by', 'supporting_material'
+            "id",
+            "person",
+            "column",
+            "old_value",
+            "new_value",
+            "status",
+            "requested_at",
+            "reviewed_at",
+            "reviewed_by",
+            "supporting_material",
         ]
 
 
@@ -221,30 +229,47 @@ class PersonCardChangeRequestReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = PersonCardChangeRequest
         fields = [
-            'id', 'person', 'column', 'old_value', 'new_value', 'status',
-            'requested_at', 'reviewed_at', 'reviewed_by', 'supporting_material'
+            "id",
+            "person",
+            "column",
+            "old_value",
+            "new_value",
+            "status",
+            "requested_at",
+            "reviewed_at",
+            "reviewed_by",
+            "supporting_material",
         ]
         read_only_fields = [
-            'id', 'person', 'column', 'old_value', 'new_value',
-            'requested_at', 'supporting_material'
+            "id",
+            "person",
+            "column",
+            "old_value",
+            "new_value",
+            "requested_at",
+            "supporting_material",
         ]
 
     def update(self, instance, validated_data):
-        new_status = validated_data.get('status')
-        if new_status not in ['approved', 'rejected']:
-            raise serializers.ValidationError("Status must be either 'approved' or 'rejected'.")
+        new_status = validated_data.get("status")
+        if new_status not in ["approved", "rejected"]:
+            raise serializers.ValidationError(
+                "Status must be either 'approved' or 'rejected'."
+            )
         instance.status = new_status
         instance.reviewed_at = timezone.now()
-        request = self.context.get('request')
-        if request and hasattr(request, 'user'):
+        request = self.context.get("request")
+        if request and hasattr(request, "user"):
             instance.reviewed_by = request.user.person
         instance.save()
 
-        if new_status == 'approved':
+        if new_status == "approved":
             # 실제 개인정보 업데이트: 승인된 경우에만 PersonalInfo에 반영
             personal_info = instance.person.personal_info
             if not personal_info:
-                raise serializers.ValidationError("해당 직원의 PersonalInfo가 존재하지 않습니다.")
+                raise serializers.ValidationError(
+                    "해당 직원의 PersonalInfo가 존재하지 않습니다."
+                )
 
             column = instance.column  # PersonCardColumns instance
             new_value = instance.new_value
@@ -266,12 +291,16 @@ class PersonCardChangeRequestReviewSerializer(serializers.ModelSerializer):
                         p_card_info_instance = PersonCardInfo.objects.create()
                         personal_info.p_card_info = p_card_info_instance
                         personal_info.save()
-                    current_p_card_info = p_card_info_instance.p_card_info if p_card_info_instance.p_card_info else {}
+                    current_p_card_info = (
+                        p_card_info_instance.p_card_info
+                        if p_card_info_instance.p_card_info
+                        else {}
+                    )
                     current_p_card_info[column.column_name] = new_value
                     p_card_info_instance.p_card_info = current_p_card_info
                     p_card_info_instance.save()
             # 승인되었으므로 최종 상태 변경
-            instance.status = 'applied'
+            instance.status = "applied"
             instance.save()
         return instance
 

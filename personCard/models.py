@@ -1,5 +1,4 @@
 from django.db import models
-from django.utils import timezone
 from person.models import Person
 
 
@@ -47,17 +46,21 @@ class PersonCardColumns(models.Model):
 
 class PersonCardChangeRequest(models.Model):
     STATUS_CHOICES = (
-        ('pending', 'Pending'),
-        ('approved', 'Approved'),
-        ('applied', 'Applied'),
-        ('rejected', 'Rejected'),
+        ("pending", "Pending"),
+        ("approved", "Approved"),
+        ("applied", "Applied"),
+        ("rejected", "Rejected"),
     )
 
-    person = models.ForeignKey(Person, on_delete=models.CASCADE, related_name='card_change_requests')
-    column = models.ForeignKey(PersonCardColumns, on_delete=models.CASCADE, related_name='change_requests')
+    person = models.ForeignKey(
+        Person, on_delete=models.CASCADE, related_name="card_change_requests"
+    )
+    column = models.ForeignKey(
+        PersonCardColumns, on_delete=models.CASCADE, related_name="change_requests"
+    )
     old_value = models.TextField(null=True, blank=True)
     new_value = models.TextField()
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
     requested_at = models.DateTimeField(auto_now_add=True)
     reviewed_at = models.DateTimeField(null=True, blank=True)
     reviewed_by = models.ForeignKey(
@@ -65,13 +68,15 @@ class PersonCardChangeRequest(models.Model):
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
-        related_name='approved_card_changes'
+        related_name="approved_card_changes",
     )
     # 증빙자료 첨부 필드 (파일이 업로드 될 경로 지정)
-    supporting_material = models.FileField(upload_to='person_card_supporting_materials/', null=True, blank=True)
+    supporting_material = models.FileField(
+        upload_to="person_card_supporting_materials/", null=True, blank=True
+    )
 
     class Meta:
-        db_table = 'person_card_change_request'
+        db_table = "person_card_change_request"
 
     def __str__(self):
         return f"Name: {self.person.name} \nColumn: {self.column.column_name} Change Request \nStatus: {self.status}"

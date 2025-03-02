@@ -9,11 +9,7 @@ urlpatterns = [
         name="person-card-list-detail",
     ),
     # 검색 페이지에서 모든 사람 정보 불러오기
-    path(
-        "list/",
-        PersonCardListAPIView.as_view(),
-        name="person-card-list"
-    ),
+    path("list/", PersonCardListAPIView.as_view(), name="person-card-list"),
     # 개인정보 업데이트 (본인/Master/HR Team)
     path(
         "<int:p_id>/info/update/",
@@ -24,20 +20,16 @@ urlpatterns = [
     path(
         "change-request/list/<int:c_id>/",
         PersonCardChangeListAPIView.as_view(),
-        name="persona-card-change-list"
+        name="persona-card-change-list",
     ),
     #  개인정보 수정 허가 (Master/HR Team)
     path(
         "change-request/<int:request_id>/review/",
         PersonCardChangeReviewAPIView.as_view(),
-        name="person-card-update-review"
+        name="person-card-update-review",
     ),
     # 인사카드 조회
-    path(
-        "<int:p_id>/",
-         PersonCardDetailAPIView.as_view(),
-        name="person-card-detail"
-    ),
+    path("<int:p_id>/", PersonCardDetailAPIView.as_view(), name="person-card-detail"),
     # 직무 히스토리 정보 불러오기 (본인/팀장/Master/HR Team)
     path(
         "<int:p_id>/history/list/",
