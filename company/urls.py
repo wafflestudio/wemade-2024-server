@@ -18,8 +18,13 @@ urlpatterns = [
         name="team-update",
     ),
     # 조직도 임시저장
-    path("draft/", EditDraftAPIView.as_view(), name="draft-get"),
-    path("draft/update/", EditDraftAPIView.as_view(), name="draft-update"),
+    path("edit/draft/", EditDraftAPIView.as_view(), name="edit-draft"),
+    # 조직도 임시저장 삭제
+    path(
+        "edit/draft/delete/<int:d_id>",
+        EditDraftDeleteAPIView.as_view(),
+        name="edit-draft-delete",
+    ),
     # Commit Restore
     path(
         "restore/corp/<int:commit_id>/<int:c_id>/",

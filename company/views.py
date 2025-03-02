@@ -60,6 +60,18 @@ class EditDraftAPIView(ListCreateAPIView):
         return Draft.objects.filter(created_by=user_person).order_by("created_at")
 
 
+# 임시저장 삭제
+class EditDraftDeleteAPIView(RetrieveDestroyAPIView):
+    serializer_class = EditDraftSerializer
+    permission_classes = [Or(IsMasterHRTeam, IsHRTeam)]
+    lookup_field = "id"
+    lookup_url_kwarg = "d_id"
+
+    def get_queryset(self):
+        user_person = self.request.user.person
+        return Draft.objects.filter(created_by=user_person).order_by("created_at")
+
+
 # Corporation 정보 업데이트 (Master)
 class CorpUpdateAPIView(RetrieveUpdateAPIView):
     serializer_class = CorpEditUpdateSerializer
