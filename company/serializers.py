@@ -8,6 +8,7 @@ from .models import (
     CorporationNameHistoryInfo,
     CompanyCommit,
     CompanyCommitAction,
+    Draft,
 )
 from person.models import Person
 from django.db import transaction
@@ -269,11 +270,11 @@ class EditDraftSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Draft
-        fields = ['id', 'created_at', 'created_by', 'changes']
+        fields = ["id", "created_at", "created_by", "changes"]
 
     def create(self, validated_data):
-        user_person = self.context['request'].user.person
-        validated_data['created_by'] = user_person
+        user_person = self.context["request"].user.person
+        validated_data["created_by"] = user_person
         return super().create(validated_data)
 
 
