@@ -1,4 +1,8 @@
 from django.shortcuts import get_object_or_404
+from company.permissions import *
+from company.models import *
+from django.core.exceptions import PermissionDenied
+
 from rest_framework.generics import (
     ListAPIView,
     RetrieveAPIView,
@@ -12,6 +16,8 @@ from rest_framework.permissions import AllowAny
 from rest_condition import Or
 
 from company.permissions import IsMasterHRTeam
+from person.models import PersonalInfo
+from .models import *
 from .serializers import *
 from .paginations import *
 from .permissions import IsOwnerOrHRTeam, IsOwnerOrHRTeamOrTeamLeader
@@ -60,6 +66,65 @@ class PersonalInfoUpdateAPIView(RetrieveUpdateDestroyAPIView):
     permission_classes = [Or(IsMasterHRTeam, IsOwnerOrHRTeam)]
 
 
+# 개인정보 수정 요청 list
+class PersonCardChangeListAPIView(ListAPIView):
+    serializer_class = PersonCardChangeListSerializer
+    permission_classes = [Or(IsMasterHRTeam, IsHRTeam)]
+
+    def get_queryset(self):
+        user_person = self.request.user.person
+        c_id = self.kwargs.get("c_id")
+
+        # MasterHRTeam은 모든 요청을 볼 수 있음
+        if IsMasterHRTeam().has_permission(self.request, self):
+            if c_id:
+                return (
+                    PersonCardChangeRequest.objects.filter(
+                        person__member_of_teams__corporation__c_id=c_id
+                    )
+                    .distinct()
+                    .order_by("requested_at")
+                )
+            return PersonCardChangeRequest.objects.all().order_by("requested_at")
+
+        # HR팀원이라면 해당 법인의 HR팀에 속해야 함
+        try:
+            corp = Corporation.objects.get(c_id=c_id)
+        except Corporation.DoesNotExist:
+            raise PermissionDenied("해당 Corporation이 존재하지 않습니다.")
+
+        if user_person not in corp.hr_team.members.all():
+            raise PermissionDenied("해당 법인의 HR팀원만 접근할 수 있습니다.")
+
+        return (
+            PersonCardChangeRequest.objects.filter(
+                person__member_of_teams__corporation=corp
+            )
+            .distinct()
+            .order_by("requested_at")
+        )
+
+
+# 개인정보 수정 허가
+class PersonCardChangeReviewAPIView(RetrieveUpdateAPIView):
+    serializer_class = PersonCardChangeRequestReviewSerializer
+    permission_classes = [Or(IsMasterHRTeam, IsHRTeam)]
+    lookup_field = "id"
+    lookup_url_kwarg = "request_id"
+
+    def get_queryset(self):
+        qs = PersonCardChangeRequest.objects.filter(status="pending")
+        user_person = self.request.user.person
+
+        # 만약 사용자가 MasterHRTeam이 아니라면, 자신이 관리하는 직원들의 요청만 필터링
+        if not IsMasterHRTeam().has_permission(self.request, self):
+            # 사용자가 속한 HR팀에 해당하는 법인의 구성원만 조회
+            qs = qs.filter(
+                person__member_of_teams__corporation__hr_team__members=user_person
+            )
+        return qs.distinct().order_by("requested_at")
+
+
 # 직무 히스토리 정보 불러오기
 class RoleHistoryListAPIView(ListAPIView):
     serializer_class = RoleHistorySerializer
@@ -91,3 +156,6 @@ class RoleHistoryUpdateAPIView(RetrieveUpdateAPIView):
 
         obj = get_object_or_404(Role, r_id=role_id, person=person)
         return obj
+
+
+#

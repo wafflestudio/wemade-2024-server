@@ -16,6 +16,18 @@ urlpatterns = [
         PersonalInfoUpdateAPIView.as_view(),
         name="personal-info-update",
     ),
+    # 개인정보 수정 요청 list (Master/HR Team)
+    path(
+        "change-request/list/<int:c_id>/",
+        PersonCardChangeListAPIView.as_view(),
+        name="persona-card-change-list",
+    ),
+    #  개인정보 수정 허가 (Master/HR Team)
+    path(
+        "change-request/<int:request_id>/review/",
+        PersonCardChangeReviewAPIView.as_view(),
+        name="person-card-update-review",
+    ),
     # 인사카드 조회
     path("<int:p_id>/", PersonCardDetailAPIView.as_view(), name="person-card-detail"),
     # 직무 히스토리 정보 불러오기 (본인/팀장/Master/HR Team)

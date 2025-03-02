@@ -9,9 +9,7 @@ urlpatterns = [
     path("edit/team/<int:t_id>/", TeamEditListAPIView.as_view(), name="team-edit-list"),
     # Corporation 정보 업데이트 - 조직 이동/비활성화 (Master)
     path(
-        "edit/corp/<int:c_id>/update/",
-        CorpUpdateAPIView.as_view(),
-        name="corp-update",
+        "edit/corp/<int:c_id>/update/", CorpUpdateAPIView.as_view(), name="corp-update"
     ),
     # Team 정보 업데이트(1) - 조직 이동/비활성화 (Master/HR Team)
     path(
@@ -19,6 +17,22 @@ urlpatterns = [
         TeamUpdateAPIView.as_view(),
         name="team-update",
     ),
+    # 조직도 임시저장
+    path("draft/", EditDraftAPIView.as_view(), name="draft-get"),
+    path("draft/update/", EditDraftAPIView.as_view(), name="draft-update"),
+    # Commit Restore
+    path(
+        "restore/corp/<int:commit_id>/<int:c_id>/",
+        CorpRestoreView.as_view(),
+        name="corp-restore",
+    ),
+    path(
+        "restore/team/<int:commit_id>/<int:t_id>/",
+        TeamRestoreView.as_view(),
+        name="team-restore",
+    ),
+    path("commit/list/", CompanyCommitListView.as_view(), name="commit-list"),
+    path("commit/latest/", CurrentCommitView.as_view(), name="commit-list"),
     # ----- 인사이동 관련 -----
     # Role
     # 특정한 사람의 role 조회 (supervisor 변경 포함)
@@ -57,17 +71,4 @@ urlpatterns = [
         RoleDeleteAPIView.as_view(),
         name="role-delete",
     ),
-    # Commit Restore
-    path(
-        "restore/corp/<int:commit_id>/<int:c_id>/",
-        CorpRestoreView.as_view(),
-        name="corp-restore",
-    ),
-    path(
-        "restore/team/<int:commit_id>/<int:t_id>/",
-        TeamRestoreView.as_view(),
-        name="team-restore",
-    ),
-    path("commit/list/", CompanyCommitListView.as_view(), name="commit-list"),
-    path("commit/latest/", CurrentCommitView.as_view(), name="commit-list"),
 ]
