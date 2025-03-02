@@ -6,6 +6,7 @@ from rest_framework import status
 from rest_framework.generics import (
     ListAPIView,
     CreateAPIView,
+    ListCreateAPIView,
     RetrieveAPIView,
     RetrieveUpdateAPIView,
     RetrieveDestroyAPIView,
@@ -47,6 +48,16 @@ class TeamEditListAPIView(ListAPIView):
     lookup_field = "t_id"
     lookup_url_kwarg = "t_id"
     permission_classes = [Or(IsMasterHRTeam, IsHRTeam)]
+
+
+# 임시저장
+class EditDraftAPIView(ListCreateAPIView):
+    serializer_class = EditDraftSerializer
+    permission_classes = [Or(IsMasterHRTeam, IsHRTeam)]
+
+    def get_queryset(self):
+        user_person = self.request.user.person
+        return Draft.objects.filter(created_by=user_person).order_by("created_at")
 
 
 # Corporation 정보 업데이트 (Master)

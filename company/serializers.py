@@ -263,6 +263,20 @@ class TeamEditUpdateSerializer(serializers.ModelSerializer):
         return instance
 
 
+# 임시저장
+class EditDraftSerializer(serializers.ModelSerializer):
+    created_by = serializers.PrimaryKeyRelatedField(read_only=True)
+
+    class Meta:
+        model = Draft
+        fields = ['id', 'created_at', 'created_by', 'changes']
+
+    def create(self, validated_data):
+        user_person = self.context['request'].user.person
+        validated_data['created_by'] = user_person
+        return super().create(validated_data)
+
+
 # class TeamUpdateSerializer(serializers.ModelSerializer):
 #     class Meta:
 #         model = Team

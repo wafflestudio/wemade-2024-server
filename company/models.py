@@ -232,3 +232,15 @@ class TeamParentHistoryInfo(models.Model):
 
     class Meta:
         db_table = "team_parent_history"
+
+
+class Draft(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    created_by = models.ForeignKey(Person, on_delete=models.SET_NULL, null=True, blank=True, related_name='drafts')
+    changes = models.JSONField()
+
+    class Meta:
+        db_table = 'draft'
+
+    def __str__(self):
+        return f"Draft by {self.created_by} at {self.created_at}"
