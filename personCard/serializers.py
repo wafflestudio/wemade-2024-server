@@ -1,10 +1,14 @@
+import logging
+
 from django.utils import timezone
 from rest_framework import serializers
 from person.models import Person, PersonalInfo, PersonCardInfo
 from company.models import Role, RoleSupervisorHistory
 from .models import PersonCardChangeRequest, PersonCardColumns
 from .validators import PersonCardInfoValidator
+from logging import getLogger
 
+log = getLogger(__name__)
 
 RESTRICTED_FIELDS = ["main_phone_number", "birthday", "name"]
 
@@ -130,7 +134,7 @@ class PersonalInfoUpdateSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         # Pop out p_info and p_card_info data
-        new_p_card_info_data = validated_data.pop("p_card_info", None)
+        new_p_card_info_data = validated_data.pop("p_card_info", None)["p_card_info"]
         new_p_info_data = validated_data.pop("p_info", None)
 
         # Process RESTRICTED_FIELDS: don't update them immediately; create change requests instead.
@@ -163,7 +167,7 @@ class PersonalInfoUpdateSerializer(serializers.ModelSerializer):
                 if column and column.permission_required:
                     old_value = current_p_info.get(key, "")
                     if old_value != new_value:
-                        supporting_material = new_value["supporting_material"]
+                        supporting_material = new_value["supporting_material"] if new_value["supporting_material"] else None
                         PersonCardChangeRequest.objects.create(
                             person=instance.person,
                             column=column,
@@ -185,11 +189,12 @@ class PersonalInfoUpdateSerializer(serializers.ModelSerializer):
             else:
                 current_p_card_info = {}
             for key, new_value in new_p_card_info_data.items():
+                log.critical("key: %s, new_value: %s", key, new_value)
                 column = PersonCardColumns.objects.filter(column_name=key).first()
                 if column and column.permission_required:
                     old_value = current_p_card_info.get(key, "")
                     if old_value != new_value:
-                        supporting_material = new_value["supporting_material"]
+                        supporting_material = new_value["supporting_material"] if new_value["supporting_material"] else None
                         PersonCardChangeRequest.objects.create(
                             person=instance.person,
                             column=column,
@@ -204,7 +209,7 @@ class PersonalInfoUpdateSerializer(serializers.ModelSerializer):
             p_card_info_instance = instance.p_card_info
             if not p_card_info_instance:
                 p_card_info_instance = PersonCardInfo.objects.create()
-                instance.p_card_info = p_card_info_instance
+                instance.p_card_info = p_card_info_instance.p_card_info
                 instance.save()
             if current_p_card_info:
                 p_card_info_instance.p_card_info = current_p_card_info
