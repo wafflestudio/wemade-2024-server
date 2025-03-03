@@ -1,3 +1,4 @@
+from django.utils import timezone
 from rest_framework import serializers
 from person.models import Person, PersonalInfo, PersonCardInfo
 from company.models import Role, RoleSupervisorHistory
@@ -162,7 +163,7 @@ class PersonalInfoUpdateSerializer(serializers.ModelSerializer):
                 if column and column.permission_required:
                     old_value = current_p_info.get(key, "")
                     if old_value != new_value:
-                        supporting_material = request_files.get(key)
+                        supporting_material = new_value["supporting_material"]
                         PersonCardChangeRequest.objects.create(
                             person=instance.person,
                             column=column,
@@ -188,7 +189,7 @@ class PersonalInfoUpdateSerializer(serializers.ModelSerializer):
                 if column and column.permission_required:
                     old_value = current_p_card_info.get(key, "")
                     if old_value != new_value:
-                        supporting_material = request_files.get(key)
+                        supporting_material = new_value["supporting_material"]
                         PersonCardChangeRequest.objects.create(
                             person=instance.person,
                             column=column,
@@ -264,7 +265,7 @@ class PersonCardChangeRequestReviewSerializer(serializers.ModelSerializer):
                 "Status must be either 'approved' or 'rejected'."
             )
         instance.status = new_status
-        instance.reviewed_at = timezone.now()
+        instance.reviewed_at = timezone.now
         request = self.context.get("request")
         if request and hasattr(request, "user"):
             instance.reviewed_by = request.user.person
