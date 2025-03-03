@@ -79,15 +79,22 @@ class PersonCardDetailSerializer(serializers.ModelSerializer):
     p_card_info = serializers.JSONField(
         source="personal_info.p_card_info.p_card_info", required=False, allow_null=True
     )
+    roles = serializers.SerializerMethodField()
 
     class Meta:
         model = Person
-        fields = ["name", "phone_number", "info", "emails", "p_card_info"]
+        fields = ["name", "phone_number", "info", "emails", "p_card_info", "roles"]
 
     def get_emails(self, obj):
         if obj.personal_info and isinstance(obj.personal_info.emails, list):
             return obj.personal_info.emails
         return []
+
+    def get_roles(self, obj):
+        return [
+            {"t_id": role.team.t_id, "r_id": role.r_id, "role": role.role_name}
+            for role in obj.roles.filter(end_date__isnull=True)
+        ]
 
 
 class PersonalInfoUpdateSerializer(serializers.ModelSerializer):
