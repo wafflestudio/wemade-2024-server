@@ -262,3 +262,5 @@ SWAGGER_SETTINGS = {
 AZURE_ACCOUNT_NAME = os.getenv("AZURE_ACCOUNT_NAME")
 AZURE_ACCOUNT_KEY = os.getenv("AZURE_ACCOUNT_KEY")
 AZURE_CONTAINER = os.getenv("AZURE_CONTAINER_NAME")
+
+# Filler for Azure deployment errors
