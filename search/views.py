@@ -70,7 +70,7 @@ class PersonSearchAPIView(APIView):
             if query:
                 query_clean = query.replace(" ", "")
                 persons = persons.annotate(
-                    clean_cert=RemoveSpaces(F("personal_info__p_info__certificates"))
+                    clean_cert=RemoveSpaces(F("personal_info__p_info__자격증"))
                 ).filter(clean_cert__icontains=query_clean)
         else:
             # 기본은 name 검색
