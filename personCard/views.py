@@ -17,6 +17,7 @@ from rest_condition import Or
 
 from company.permissions import IsMasterHRTeam
 from person.models import PersonalInfo
+from drf_yasg.utils import swagger_auto_schema
 from .models import *
 from .serializers import *
 from .paginations import *
@@ -37,6 +38,10 @@ class PersonCardListAPIView(ListAPIView):
 
 
 # 검색 페이지 우측 특정한 사람 공개 정보 불러오기
+@swagger_auto_schema(
+    operation_description="특정한 사람의 공개 정보를 불러옵니다.",
+    responses={200: PersonCardListDetailSerializer()},
+)
 class PersonCardListDetailAPIView(RetrieveAPIView):
     serializer_class = PersonCardListDetailSerializer
     permission_classes = [AllowAny]

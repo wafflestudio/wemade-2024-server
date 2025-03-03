@@ -1,6 +1,7 @@
 from copy import deepcopy
 
 from django.db.models import OuterRef, Subquery
+from drf_yasg.utils import swagger_auto_schema
 from django.db.models.aggregates import Max
 from rest_framework import status
 from rest_framework.generics import (
@@ -29,6 +30,10 @@ class EditListAPIView(ListAPIView):
     serializer_class = CorpDetailSerializer
     permission_classes = [Or(IsMasterHRTeam, IsHRTeam)]
 
+    @swagger_auto_schema(
+        operation_summary="Edit mode Corporation List",
+        operation_description="List of Corporations for editing mode",
+    )
     def get_queryset(self):
         user_person = self.request.user.person
         # 만약 요청 사용자가 MasterHRTeam이면 모든 법인을, 아니라면 자신이 HR팀 구성원인 법인 반환
@@ -42,6 +47,9 @@ class EditListAPIView(ListAPIView):
 
 
 # Edit mode Team List
+@swagger_auto_schema(
+    operation_summary="Edit mode Team List",
+)
 class TeamEditListAPIView(ListAPIView):
     serializer_class = TeamEditListSerializer
     queryset = Team.objects.all().order_by("name")
@@ -51,6 +59,9 @@ class TeamEditListAPIView(ListAPIView):
 
 
 # 임시저장
+@swagger_auto_schema(
+    operation_summary="조직도 임시저장",
+)
 class EditDraftAPIView(ListCreateAPIView):
     serializer_class = EditDraftSerializer
     permission_classes = [Or(IsMasterHRTeam, IsHRTeam)]
@@ -61,6 +72,9 @@ class EditDraftAPIView(ListCreateAPIView):
 
 
 # 임시저장 삭제
+@swagger_auto_schema(
+    operation_summary="조직도 임시저장 삭제",
+)
 class EditDraftDeleteAPIView(RetrieveDestroyAPIView):
     serializer_class = EditDraftSerializer
     permission_classes = [Or(IsMasterHRTeam, IsHRTeam)]
@@ -73,6 +87,9 @@ class EditDraftDeleteAPIView(RetrieveDestroyAPIView):
 
 
 # Corporation 정보 업데이트 (Master)
+@swagger_auto_schema(
+    operation_summary="Corporation 정보 업데이트 - 조직 이동/비활성화 (Master)",
+)
 class CorpUpdateAPIView(RetrieveUpdateAPIView):
     serializer_class = CorpEditUpdateSerializer
     queryset = Corporation.objects.all()
@@ -104,6 +121,9 @@ class CorpUpdateAPIView(RetrieveUpdateAPIView):
 
 
 # Team 정보 업데이트 (Master/HR Team)
+@swagger_auto_schema(
+    operation_summary="Team 정보 업데이트(1) - 조직 이동/비활성화 (Master/HR Team)",
+)
 class TeamUpdateAPIView(RetrieveUpdateAPIView):
     serializer_class = TeamEditUpdateSerializer
     queryset = Team.objects.all()
@@ -151,6 +171,9 @@ class TeamUpdateAPIView(RetrieveUpdateAPIView):
 
 # --------- 인사 이동 관련 Views ------------
 # 특정한 사람의 role 생성 (부서 이동/발령)
+@swagger_auto_schema(
+    operation_summary="특정한 사람의 role 생성 (부서 이동/발령)",
+)
 class RoleCreateAPIView(CreateAPIView):
     queryset = Role.objects.all()
     serializer_class = RoleCreateSerializer
@@ -158,6 +181,9 @@ class RoleCreateAPIView(CreateAPIView):
 
 
 # 특정한 사람의 role 변경 (직급 변경)
+@swagger_auto_schema(
+    operation_summary="특정한 사람의 role 변경 (직급 변경)",
+)
 class RoleUpdateAPIView(RetrieveUpdateAPIView):
     lookup_field = "r_id"
     lookup_url_kwarg = "r_id"
@@ -166,6 +192,9 @@ class RoleUpdateAPIView(RetrieveUpdateAPIView):
     permission_classes = [Or(IsMasterHRTeam, IsHRTeam)]
 
 
+@swagger_auto_schema(
+    operation_summary="특정한 사람의 role 조회 (supervisor 변경 포함)",
+)
 class RoleListDetailAPIView(ListAPIView):
     serializer_class = RoleDetailSerializer
     permission_classes = [Or(IsMasterHRTeam, IsHRTeam)]
@@ -190,6 +219,9 @@ class RoleListDetailAPIView(ListAPIView):
 
 # --- Corporation Views ---
 # 새로운 Corporation 생성
+@swagger_auto_schema(
+    operation_summary="새로운 Corporation 생성",
+)
 class CorpCreateAPIView(CreateAPIView):
     serializer_class = CorpCreateSerializer
     permission_classes = [IsMasterHRTeam]
@@ -217,6 +249,9 @@ class CorpCreateAPIView(CreateAPIView):
 
 
 # 모든 Corporation List
+@swagger_auto_schema(
+    operation_summary="모든 Corporation List",
+)
 class CorpListAPIView(ListAPIView):
     serializer_class = CorpListSerializer
     # pagination_class = CorpListPagination
@@ -230,6 +265,9 @@ class CorpListAPIView(ListAPIView):
 
 
 # 특정 Corporation의 정보 조회
+@swagger_auto_schema(
+    operation_summary="특정 Corporation의 정보 조회",
+)
 class CorpDetailAPIView(RetrieveAPIView):
     serializer_class = CorpDetailSerializer
     queryset = Corporation.objects.all()
@@ -238,6 +276,9 @@ class CorpDetailAPIView(RetrieveAPIView):
     permission_classes = [AllowAny]
 
 
+@swagger_auto_schema(
+    operation_summary="Corporation 삭제",
+)
 class CorpDeleteAPIView(RetrieveDestroyAPIView):
     serializer_class = CorpDetailSerializer
     queryset = Corporation.objects.all()
@@ -293,6 +334,9 @@ class CorpDeleteAPIView(RetrieveDestroyAPIView):
 
 # --- Team Views ---
 # 새로운 Team 생성
+@swagger_auto_schema(
+    operation_summary="새로운 Team 생성",
+)
 class TeamCreateAPIView(CreateAPIView):
     serializer_class = TeamCreateSerializer
     permission_classes = [Or(IsMasterHRTeam, IsHRTeam)]
@@ -325,6 +369,9 @@ class TeamCreateAPIView(CreateAPIView):
 
 
 # 모든 Team List
+@swagger_auto_schema(
+    operation_summary="모든 Team List",
+)
 class TeamListAPIView(ListAPIView):
     serializer_class = TeamListSerializer
     # pagination_class = TeamListPagination
@@ -338,6 +385,9 @@ class TeamListAPIView(ListAPIView):
 
 
 # 특정 Team의 정보 조회
+@swagger_auto_schema(
+    operation_summary="특정 Team의 정보 조회",
+)
 class TeamDetailAPIView(RetrieveAPIView):
     serializer_class = TeamDetailSerializer
     queryset = Team.objects.all()
@@ -345,7 +395,9 @@ class TeamDetailAPIView(RetrieveAPIView):
     lookup_url_kwarg = "t_id"
     permission_classes = [AllowAny]
 
-
+@swagger_auto_schema(
+    operation_summary="Team 삭제",
+)
 class TeamDeleteAPIView(RetrieveDestroyAPIView):
     serializer_class = TeamDetailSerializer
     queryset = Team.objects.all()
@@ -402,6 +454,9 @@ class TeamDeleteAPIView(RetrieveDestroyAPIView):
 
 
 # ----- Role Views -----
+@swagger_auto_schema(
+    operation_summary="Role 삭제",
+)
 class RoleDeleteAPIView(RetrieveDestroyAPIView):
     serializer_class = RoleDetailSerializer
     queryset = Role.objects.all()
@@ -424,7 +479,9 @@ class RoleDeleteAPIView(RetrieveDestroyAPIView):
 
 # --- Commit Views ---
 
-
+@swagger_auto_schema(
+    operation_summary="Commit Restore old status",
+)
 class CorpRestoreView(RetrieveAPIView):
     serializer_class = CorpRestoreSerializer
     queryset = Corporation.objects.all()
@@ -470,6 +527,9 @@ class CorpRestoreView(RetrieveAPIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+@swagger_auto_schema(
+    operation_summary="Commit Restore old status",
+)
 class TeamRestoreView(RetrieveAPIView):
     serializer_class = TeamRestoreSerializer
     queryset = Team.objects.all()
@@ -514,13 +574,18 @@ class TeamRestoreView(RetrieveAPIView):
         serializer = self.get_serializer(team_copy, commit=commit)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-
+@swagger_auto_schema(
+    operation_summary="Commit List",
+)
 class CompanyCommitListView(ListAPIView):
     serializer_class = CompanyCommitSerializer
     queryset = CompanyCommit.objects.all().order_by("-created_at")
     permission_classes = [Or(IsMasterHRTeam, IsHRTeam)]
 
 
+@swagger_auto_schema(
+    operation_summary="Current Commit",
+)
 class CurrentCommitView(APIView):
     permission_classes = [Or(IsMasterHRTeam, IsHRTeam)]
 

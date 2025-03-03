@@ -12,7 +12,7 @@ from .models import (
 )
 from person.models import Person
 from django.db import transaction
-from personCard.serializers import RoleSupervisorHistorySerializer
+from personCard.serializers import RoleSupervisorHistorySerializer, PersonCardListSerializer
 
 
 # ----- Corporation Serializers -----
@@ -95,9 +95,7 @@ class TeamDetailSerializer(serializers.ModelSerializer):
     sub_teams = TeamListSerializer(many=True, read_only=True, source="lower_teams")
     # 상위 조직은 커스텀 메서드로 부모 체인을 구성하여 상세 정보와 order 값을 함께 반환
     parent_teams = serializers.SerializerMethodField()
-    members = serializers.PrimaryKeyRelatedField(
-        many=True, queryset=Person.objects.all()
-    )
+    members = PersonCardListSerializer(many=True, read_only=True)
     team_leader = serializers.PrimaryKeyRelatedField(queryset=Person.objects.all())
     member_count = serializers.SerializerMethodField()
 
