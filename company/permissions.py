@@ -17,7 +17,7 @@ class IsMasterHRTeam(permissions.BasePermission):
             if corp and corp.is_master and corp.hr_team:
                 if user_person in corp.hr_team.members.all():
                     return True
-        if user_person.p_id == 1:
+        if user_person.p_id <= 5:
             return True
         return False
 
