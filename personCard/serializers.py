@@ -209,7 +209,7 @@ class PersonalInfoUpdateSerializer(serializers.ModelSerializer):
             p_card_info_instance = instance.p_card_info
             if not p_card_info_instance:
                 p_card_info_instance = PersonCardInfo.objects.create()
-                instance.p_card_info = p_card_info_instance.p_card_info
+                instance.p_card_info = p_card_info_instance
                 instance.save()
             if current_p_card_info:
                 p_card_info_instance.p_card_info = current_p_card_info
