@@ -71,9 +71,7 @@ class PersonCardChangeRequest(models.Model):
         related_name="approved_card_changes",
     )
     # 증빙자료 첨부 필드 (파일이 업로드 될 경로 지정)
-    supporting_material = models.FileField(
-        upload_to="person_card_supporting_materials/", null=True, blank=True
-    )
+    supporting_material = models.CharField()
 
     class Meta:
         db_table = "person_card_change_request"
