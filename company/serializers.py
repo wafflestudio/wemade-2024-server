@@ -187,7 +187,7 @@ class TeamEditUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Team
-        fields = ["name", "corporation", "sub_teams", "parent_teams"]
+        fields = ["name", "corporation", "sub_teams", "parent_teams", "members"]
 
     def deactivate_team_recursive(self, team_obj):
         """
