@@ -24,7 +24,7 @@ class PersonCardListSerializer(serializers.ModelSerializer):
 
     def get_corporations(self, obj):
         return list(
-            set(team.corporation.commit_id for team in obj.member_of_teams.all())
+            set(team.corporation.c_id for team in obj.member_of_teams.all())
         )
 
     def get_teams(self, obj):
