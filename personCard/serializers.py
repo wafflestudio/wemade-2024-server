@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from person.models import Person, PersonalInfo, PersonCardInfo
 from company.models import Role, RoleSupervisorHistory
-from .models import PersonCardChangeRequest
+from .models import PersonCardChangeRequest, PersonCardColumns
 from .validators import PersonCardInfoValidator
 
 
@@ -374,3 +374,8 @@ class RoleHistoryUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Role
         fields = ["job_description"]
+
+class CardColumnSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PersonCardColumns
+        fields = "__all__"

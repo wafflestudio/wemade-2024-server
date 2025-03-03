@@ -158,4 +158,9 @@ class RoleHistoryUpdateAPIView(RetrieveUpdateAPIView):
         return obj
 
 
-#
+class CardColumnsAPIView(ListAPIView):
+    serializer_class = CardColumnSerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        return PersonCardColumns.objects.all()
