@@ -171,8 +171,8 @@ class PersonalInfoUpdateSerializer(serializers.ModelSerializer):
                         PersonCardChangeRequest.objects.create(
                             person=instance.person,
                             column=column,
-                            old_value=str(old_value),
-                            new_value=str(new_value),
+                            old_value=old_value,
+                            new_value=new_value,
                             status="pending",
                             supporting_material=supporting_material,
                         )
@@ -192,14 +192,14 @@ class PersonalInfoUpdateSerializer(serializers.ModelSerializer):
                 log.critical("key: %s, new_value: %s", key, new_value)
                 column = PersonCardColumns.objects.filter(column_name=key).first()
                 if column and column.permission_required:
-                    old_value = current_p_card_info.get(key, "")
+                    old_value = current_p_card_info.get(key, {})
                     if old_value != new_value:
                         supporting_material = new_value["supporting_material"] if "supporting_material" in new_value else None
                         PersonCardChangeRequest.objects.create(
                             person=instance.person,
                             column=column,
-                            old_value=str(old_value),
-                            new_value=str(new_value),
+                            old_value=old_value,
+                            new_value=new_value,
                             status="pending",
                             supporting_material=supporting_material,
                         )
