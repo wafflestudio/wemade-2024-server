@@ -35,6 +35,8 @@ class CorpCreateSerializer(serializers.ModelSerializer):
 
 
 class CorpEditUpdateSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(required=False)
+
     class Meta:
         model = Corporation
         fields = ["name", "sub_teams", "is_active", "is_master", "hr_team"]
