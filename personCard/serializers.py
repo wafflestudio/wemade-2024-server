@@ -270,7 +270,7 @@ class PersonCardChangeRequestReviewSerializer(serializers.ModelSerializer):
                 "Status must be either 'approved' or 'rejected'."
             )
         instance.status = new_status
-        instance.reviewed_at = timezone.now
+        instance.reviewed_at = timezone.now()
         request = self.context.get("request")
         if request and hasattr(request, "user"):
             instance.reviewed_by = request.user.person
