@@ -30,11 +30,11 @@ schema_view = get_schema_view(
         description="",
         terms_of_service="",
         contact=openapi.Contact(email="dlacksdud2@gmail.com"),
-        license=openapi.License(name=""),
-        url=os.getenv("DEPLOY_URL")
+        license=openapi.License(name="")
     ),
     public=True,
     permission_classes=[permissions.AllowAny],
+    url=os.getenv("DEPLOY_URL")
 )
 urlpatterns = [
     path("admin/", admin.site.urls),
