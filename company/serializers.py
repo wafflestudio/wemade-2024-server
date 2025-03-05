@@ -365,7 +365,7 @@ class ActiveRoleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Role
-        fields = ["r_id", "team", "role_name", "supervisor", "isHR"]
+        fields = ["r_id", "team", "role_name", "supervisor", "is_HR"]
 
 
 # class PersonRolesUpdateSerializer(serializers.ModelSerializer):
