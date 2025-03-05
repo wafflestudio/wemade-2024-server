@@ -14,6 +14,7 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+import os
 
 from django.contrib import admin
 from django.urls import include, path, re_path
@@ -30,6 +31,7 @@ schema_view = get_schema_view(
         terms_of_service="",
         contact=openapi.Contact(email="dlacksdud2@gmail.com"),
         license=openapi.License(name=""),
+        url=os.getenv("DEPLOY_URL")
     ),
     public=True,
     permission_classes=[permissions.AllowAny],
