@@ -76,4 +76,10 @@ urlpatterns = [
         RoleDeleteAPIView.as_view(),
         name="role-delete",
     ),
+    # 미분류 그룹
+    path(
+        "unclassified/list/",
+        UnclassifiedListAPIView.as_view(),
+        name="unclassified-list",
+    )
 ]

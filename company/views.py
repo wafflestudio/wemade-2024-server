@@ -4,6 +4,7 @@ from django.db.models import OuterRef, Subquery
 from drf_yasg.utils import swagger_auto_schema
 from django.db.models.aggregates import Max
 from rest_framework import status
+from django.db.models import Q
 from rest_framework.generics import (
     ListAPIView,
     CreateAPIView,
@@ -593,3 +594,12 @@ class CurrentCommitView(APIView):
         commit = CompanyCommit.objects.latest("created_at")
         serializer = CompanyCommitSerializer(commit)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+class UnclassifiedListAPIView(ListAPIView):
+    serializer_class = PersonCardListSerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        return Person.objects.filter(
+            Q(teams__isnull=True) | Q(teams__is_active=False)
+        ).distinct().order_by("name")
