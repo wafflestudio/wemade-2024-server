@@ -1,5 +1,3 @@
-import logging
-
 from django.utils import timezone
 from rest_framework import serializers
 from person.models import Person, PersonalInfo, PersonCardInfo
@@ -23,9 +21,7 @@ class PersonCardListSerializer(serializers.ModelSerializer):
     roles = serializers.SerializerMethodField()
 
     def get_corporations(self, obj):
-        return list(
-            set(team.corporation.c_id for team in obj.member_of_teams.all())
-        )
+        return list(set(team.corporation.c_id for team in obj.member_of_teams.all()))
 
     def get_teams(self, obj):
         return [team.t_id for team in obj.member_of_teams.all()]
@@ -167,7 +163,11 @@ class PersonalInfoUpdateSerializer(serializers.ModelSerializer):
                 if column and column.permission_required:
                     old_value = current_p_info.get(key, "")
                     if old_value != new_value:
-                        supporting_material = new_value["supporting_material"] if "supporting_material" in new_value else None
+                        supporting_material = (
+                            new_value["supporting_material"]
+                            if "supporting_material" in new_value
+                            else None
+                        )
                         PersonCardChangeRequest.objects.create(
                             person=instance.person,
                             column=column,
@@ -194,7 +194,11 @@ class PersonalInfoUpdateSerializer(serializers.ModelSerializer):
                 if column and column.permission_required:
                     old_value = current_p_card_info.get(key, {})
                     if old_value != new_value:
-                        supporting_material = new_value["supporting_material"] if "supporting_material" in new_value else None
+                        supporting_material = (
+                            new_value["supporting_material"]
+                            if "supporting_material" in new_value
+                            else None
+                        )
                         PersonCardChangeRequest.objects.create(
                             person=instance.person,
                             column=column,
@@ -380,6 +384,7 @@ class RoleHistoryUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Role
         fields = ["job_description"]
+
 
 class CardColumnSerializer(serializers.ModelSerializer):
     class Meta:

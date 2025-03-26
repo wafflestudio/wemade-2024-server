@@ -12,7 +12,10 @@ from .models import (
 )
 from person.models import Person
 from django.db import transaction
-from personCard.serializers import RoleSupervisorHistorySerializer, PersonCardListSerializer
+from personCard.serializers import (
+    RoleSupervisorHistorySerializer,
+    PersonCardListSerializer,
+)
 
 
 # ----- Corporation Serializers -----

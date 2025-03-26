@@ -51,9 +51,7 @@ class PersonCardListDetailAPIView(RetrieveAPIView):
 
 
 # 인사카드 조회
-@swagger_auto_schema(
-    operation_description="인사카드 조회"
-)
+@swagger_auto_schema(operation_description="인사카드 조회")
 class PersonCardDetailAPIView(RetrieveAPIView):
     serializer_class = PersonCardDetailSerializer
     permission_classes = [Or(IsMasterHRTeam, IsOwnerOrHRTeamOrTeamLeader)]
@@ -65,9 +63,7 @@ class PersonCardDetailAPIView(RetrieveAPIView):
 
 
 # 개인정보 업데이트
-@swagger_auto_schema(
-    operation_description="개인정보 업데이트"
-)
+@swagger_auto_schema(operation_description="개인정보 업데이트")
 class PersonalInfoUpdateAPIView(RetrieveUpdateDestroyAPIView):
     queryset = PersonalInfo.objects.all()
     serializer_class = PersonalInfoUpdateSerializer
@@ -77,9 +73,7 @@ class PersonalInfoUpdateAPIView(RetrieveUpdateDestroyAPIView):
 
 
 # 개인정보 수정 요청 list
-@swagger_auto_schema(
-    operation_description="개인정보 수정 요청 list"
-)
+@swagger_auto_schema(operation_description="개인정보 수정 요청 list")
 class PersonCardChangeListAPIView(ListAPIView):
     serializer_class = PersonCardChangeListSerializer
     permission_classes = [Or(IsMasterHRTeam, IsHRTeam)]
@@ -119,9 +113,7 @@ class PersonCardChangeListAPIView(ListAPIView):
 
 
 # 개인정보 수정 허가
-@swagger_auto_schema(
-    operation_description="개인정보 수정 허가"
-)
+@swagger_auto_schema(operation_description="개인정보 수정 허가")
 class PersonCardChangeReviewAPIView(RetrieveUpdateAPIView):
     serializer_class = PersonCardChangeRequestReviewSerializer
     permission_classes = [Or(IsMasterHRTeam, IsHRTeam)]
@@ -142,9 +134,7 @@ class PersonCardChangeReviewAPIView(RetrieveUpdateAPIView):
 
 
 # 직무 히스토리 정보 불러오기
-@swagger_auto_schema(
-    operation_description="직무 히스토리 정보 불러오기"
-)
+@swagger_auto_schema(operation_description="직무 히스토리 정보 불러오기")
 class RoleHistoryListAPIView(ListAPIView):
     serializer_class = RoleHistorySerializer
     permission_classes = [Or(IsMasterHRTeam, IsOwnerOrHRTeamOrTeamLeader)]
@@ -180,9 +170,7 @@ class RoleHistoryUpdateAPIView(RetrieveUpdateAPIView):
         return obj
 
 
-@swagger_auto_schema(
-    operation_description="인사카드 컬럼 정보 불러오기"
-)
+@swagger_auto_schema(operation_description="인사카드 컬럼 정보 불러오기")
 class CardColumnsAPIView(ListAPIView):
     serializer_class = CardColumnSerializer
     permission_classes = [AllowAny]

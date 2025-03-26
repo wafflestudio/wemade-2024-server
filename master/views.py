@@ -19,6 +19,7 @@ class PersonCardColumnsCreateAPIView(CreateAPIView):
     serializer_class = PersonCardColumnsSerializer
     permission_classes = [IsMasterHRTeam]
 
+
 @swagger_auto_schema(
     operation_summary="인사카드 Column 리스트",
 )
@@ -26,6 +27,7 @@ class PersonCardColumnsListAPIView(ListAPIView):
     queryset = PersonCardColumns.objects.all()
     serializer_class = PersonCardColumnsSerializer
     permission_classes = [IsMasterHRTeam]
+
 
 @swagger_auto_schema(
     operation_summary="인사카드 Column 수정",
@@ -46,6 +48,7 @@ class EmailDomainCreateAPIView(CreateAPIView):
     serializer_class = EmailDomainSerializer
     permission_classes = [IsMasterHRTeam]
 
+
 @swagger_auto_schema(
     operation_summary="Email Domain 리스트",
 )
@@ -53,6 +56,7 @@ class EmailDomainListAPIView(ListAPIView):
     queryset = EmailDomain.objects.all()
     serializer_class = EmailDomainSerializer
     permission_classes = [IsMasterHRTeam]
+
 
 @swagger_auto_schema(
     operation_summary="Email Domain 수정",

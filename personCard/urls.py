@@ -42,10 +42,9 @@ urlpatterns = [
         RoleHistoryUpdateAPIView.as_view(),
         name="personal-history-update",
     ),
-
     path(
         "columns/",
         CardColumnsAPIView.as_view(),
         name="person-card-columns",
-    )
+    ),
 ]

@@ -396,6 +396,7 @@ class TeamDetailAPIView(RetrieveAPIView):
     lookup_url_kwarg = "t_id"
     permission_classes = [AllowAny]
 
+
 @swagger_auto_schema(
     operation_summary="Team 삭제",
 )
@@ -479,6 +480,7 @@ class RoleDeleteAPIView(RetrieveDestroyAPIView):
 
 
 # --- Commit Views ---
+
 
 @swagger_auto_schema(
     operation_summary="Commit Restore old status",
@@ -575,6 +577,7 @@ class TeamRestoreView(RetrieveAPIView):
         serializer = self.get_serializer(team_copy, commit=commit)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
 @swagger_auto_schema(
     operation_summary="Commit List",
 )
@@ -595,14 +598,18 @@ class CurrentCommitView(APIView):
         serializer = CompanyCommitSerializer(commit)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
 class UnclassifiedListAPIView(ListAPIView):
     serializer_class = PersonCardListSerializer
     permission_classes = [AllowAny]
 
     def get_queryset(self):
-        return Person.objects.filter(
-            Q(teams__isnull=True) | Q(teams__is_active=False)
-        ).distinct().order_by("name")
+        return (
+            Person.objects.filter(Q(teams__isnull=True) | Q(teams__is_active=False))
+            .distinct()
+            .order_by("name")
+        )
+
 
 class CompanyCommitUpdateView(RetrieveUpdateAPIView):
     serializer_class = CompanyCommitSerializer

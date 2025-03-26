@@ -160,7 +160,10 @@ class CompanyCommit(models.Model):
         related_name="commits_made",
     )
     commit_id = models.BigAutoField(primary_key=True)
-    name = models.CharField(max_length=255, default="Change of " + timezone.now().strftime("%Y-%m-%d %H:%M:%S"))
+    name = models.CharField(
+        max_length=255,
+        default="Change of " + timezone.now().strftime("%Y-%m-%d %H:%M:%S"),
+    )
     message = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
 

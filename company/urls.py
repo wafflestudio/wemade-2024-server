@@ -38,7 +38,11 @@ urlpatterns = [
     ),
     path("commit/list/", CompanyCommitListView.as_view(), name="commit-list"),
     path("commit/latest/", CurrentCommitView.as_view(), name="commit-list"),
-    path("commit/<int:commit_id>/", CompanyCommitUpdateView.as_view(), name="commit-update"),
+    path(
+        "commit/<int:commit_id>/",
+        CompanyCommitUpdateView.as_view(),
+        name="commit-update",
+    ),
     # ----- 인사이동 관련 -----
     # Role
     # 특정한 사람의 role 조회 (supervisor 변경 포함)
@@ -82,5 +86,5 @@ urlpatterns = [
         "unclassified/list/",
         UnclassifiedListAPIView.as_view(),
         name="unclassified-list",
-    )
+    ),
 ]

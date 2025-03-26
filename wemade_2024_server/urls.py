@@ -14,6 +14,7 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
 import os
 
 from django.contrib import admin
@@ -30,11 +31,11 @@ schema_view = get_schema_view(
         description="",
         terms_of_service="",
         contact=openapi.Contact(email="dlacksdud2@gmail.com"),
-        license=openapi.License(name="")
+        license=openapi.License(name=""),
     ),
     public=True,
     permission_classes=[permissions.AllowAny],
-    url=os.getenv("DEPLOY_URL")
+    url=os.getenv("DEPLOY_URL"),
 )
 urlpatterns = [
     path("admin/", admin.site.urls),

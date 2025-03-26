@@ -4,6 +4,7 @@ from rest_framework.parsers import FileUploadParser
 from .models import StorageFile
 from drf_yasg.utils import swagger_auto_schema
 
+
 @swagger_auto_schema(operation_summary="upload file", request_body=FileUploadParser)
 class FileUploadView(APIView):
     parser_classes = [FileUploadParser]
