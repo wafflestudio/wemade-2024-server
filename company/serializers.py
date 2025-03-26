@@ -793,7 +793,8 @@ class CompanyCommitActionSerializer(serializers.ModelSerializer):
 
 class CompanyCommitSerializer(serializers.ModelSerializer):
     actions = CompanyCommitActionSerializer(many=True, read_only=True)
+    created_by = PersonCardListSerializer(read_only=True)
 
     class Meta:
         model = CompanyCommit
-        fields = ["commit_id", "created_at", "message", "actions"]
+        fields = ["commit_id", "created_at", "message", "actions", "created_by", "name"]

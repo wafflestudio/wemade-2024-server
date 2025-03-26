@@ -101,7 +101,7 @@ class CorpUpdateAPIView(RetrieveUpdateAPIView):
     def perform_update(self, serializer):
         new_commit = self.request.data.get("new_commit", False)
         if new_commit:
-            commit = CompanyCommit.objects.create()
+            CompanyCommit.objects.create(created_by=self.request.user.person)
         else:
             commit = CompanyCommit.objects.latest("created_at")
 
@@ -135,7 +135,7 @@ class TeamUpdateAPIView(RetrieveUpdateAPIView):
     def perform_update(self, serializer):
         new_commit = self.request.data.get("new_commit", False)
         if new_commit:
-            commit = CompanyCommit.objects.create()
+            commit = CompanyCommit.objects.create(created_by=self.request.user.person)
         else:
             commit = CompanyCommit.objects.latest("created_at")
 
@@ -230,7 +230,7 @@ class CorpCreateAPIView(CreateAPIView):
     def perform_create(self, serializer):
         new_commit = self.request.data.get("new_commit", False)
         if new_commit:
-            commit = CompanyCommit.objects.create()
+            commit = CompanyCommit.objects.create(created_by=self.request.user.person)
         else:
             commit = CompanyCommit.objects.latest("created_at")
 
@@ -295,7 +295,7 @@ class CorpDeleteAPIView(RetrieveDestroyAPIView):
         """
         new_commit = self.request.data.get("new_commit", False)
         if new_commit:
-            commit = CompanyCommit.objects.create()
+            commit = CompanyCommit.objects.create(created_by=self.request.user.person)
         else:
             commit = CompanyCommit.objects.latest("created_at")
 
@@ -345,7 +345,7 @@ class TeamCreateAPIView(CreateAPIView):
     def perform_create(self, serializer):
         new_commit = self.request.data.get("new_commit", False)
         if new_commit:
-            commit = CompanyCommit.objects.create()
+            commit = CompanyCommit.objects.create(created_by=self.request.user.person)
         else:
             commit = CompanyCommit.objects.latest("created_at")
 
@@ -409,7 +409,7 @@ class TeamDeleteAPIView(RetrieveDestroyAPIView):
     def perform_destroy(self, instance):
         new_commit = self.request.data.get("new_commit", False)
         if new_commit:
-            commit = CompanyCommit.objects.create()
+            commit = CompanyCommit.objects.create(created_by=self.request.user.person)
         else:
             commit = CompanyCommit.objects.latest("created_at")
 
@@ -603,3 +603,10 @@ class UnclassifiedListAPIView(ListAPIView):
         return Person.objects.filter(
             Q(teams__isnull=True) | Q(teams__is_active=False)
         ).distinct().order_by("name")
+
+class CompanyCommitUpdateView(RetrieveUpdateAPIView):
+    serializer_class = CompanyCommitSerializer
+    queryset = CompanyCommit.objects.all()
+    lookup_field = "commit_id"
+    lookup_url_kwarg = "commit_id"
+    permission_classes = [IsMasterHRTeam]
