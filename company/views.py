@@ -579,15 +579,6 @@ class TeamRestoreView(RetrieveAPIView):
 
 
 @swagger_auto_schema(
-    operation_summary="Commit List",
-)
-class CompanyCommitListView(ListAPIView):
-    serializer_class = CompanyCommitSerializer
-    queryset = CompanyCommit.objects.all().order_by("-created_at")
-    permission_classes = [Or(IsMasterHRTeam, IsHRTeam)]
-
-
-@swagger_auto_schema(
     operation_summary="Current Commit",
 )
 class CurrentCommitView(APIView):
@@ -617,3 +608,32 @@ class CompanyCommitUpdateView(RetrieveUpdateAPIView):
     lookup_field = "commit_id"
     lookup_url_kwarg = "commit_id"
     permission_classes = [IsMasterHRTeam]
+
+
+@swagger_auto_schema(
+    operation_summary="Commit List",
+)
+class CompanyCommitListView(ListAPIView):
+    serializer_class = CompanyCommitSerializer
+    permission_classes = [Or(IsMasterHRTeam, IsHRTeam)]
+
+    def get_queryset(self):
+        c_id = self.request.query_params.get("c_id")
+        if not c_id:
+            return CompanyCommit.objects.all().order_by("-created_at")
+        return (
+            CompanyCommit.objects.filter(
+                Q(
+                    actions__target_type=CompanyCommitAction.TargetType.TEAM,
+                    actions__target_id__in=Team.objects.filter(
+                        corporation_id=c_id
+                    ).values("t_id"),
+                )
+                | Q(
+                    actions__target_type=CompanyCommitAction.TargetType.CORPORATION,
+                    actions__target_id=c_id,
+                )
+            )
+            .distinct()
+            .order_by("-created_at")
+        )
