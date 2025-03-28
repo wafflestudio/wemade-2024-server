@@ -389,4 +389,12 @@ class RoleHistoryUpdateSerializer(serializers.ModelSerializer):
 class CardColumnSerializer(serializers.ModelSerializer):
     class Meta:
         model = PersonCardColumns
-        fields = "__all__"
+        fields = [
+            "id",
+            "column_name",
+            "column_type",
+            "permission_required",
+            "is_multiple",
+            "is_supporting_material_required",
+            "is_public",
+        ]
