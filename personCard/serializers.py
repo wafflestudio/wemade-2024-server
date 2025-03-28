@@ -140,7 +140,10 @@ class PersonalInfoUpdateSerializer(serializers.ModelSerializer):
                 new_value = validated_data.pop(field)
                 old_value = getattr(instance, field, "")
                 if old_value != new_value:
-                    supporting_material = new_value["supporting_material"]
+                    try:
+                        supporting_material = new_value["supporting_material"]
+                    except:
+                        supporting_material = None
                     # Create a change request (status is pending)
                     req = PersonCardChangeRequest.objects.create(
                         person=instance.person,
