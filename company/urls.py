@@ -48,6 +48,11 @@ urlpatterns = [
         CompanyCommitUpdateView.as_view(),
         name="commit-update",
     ),
+    path(
+        "commit/compare/",
+        CompanyCommitCompareListView.as_view(),
+        name="commit-compare",
+    ),
     # ----- 인사이동 관련 -----
     # Role
     # 특정한 사람의 role 조회 (supervisor 변경 포함)

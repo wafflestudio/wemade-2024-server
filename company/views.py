@@ -656,3 +656,39 @@ class CompanyCommitListView(ListAPIView):
             .distinct()
             .order_by("-created_at")
         )
+
+
+@swagger_auto_schema(
+    operation_summary="Commit compare",
+)
+class CompanyCommitCompareListView(ListAPIView):
+    serializer_class = CompanyCommitSerializer
+    permission_classes = [Or(IsMasterHRTeam, IsHRTeam)]
+
+    def get_queryset(self):
+        c_id = self.request.query_params.get("c_id")
+        starting_commit_id = self.request.query_params.get("starting_commit_id")
+        ending_commit_id = self.request.query_params.get("ending_commit_id")
+        commits = CompanyCommit.objects.filter(
+            commit_id__gte=starting_commit_id,
+            commit_id__lte=ending_commit_id,
+        )
+        if not c_id:
+            return commits.order_by("-created_at")
+        else:
+            return (
+                commits.filter(
+                    Q(
+                        actions__target_type=CompanyCommitAction.TargetType.TEAM,
+                        actions__target_id__in=Team.objects.filter(
+                            corporation_id=c_id
+                        ).values("t_id"),
+                    )
+                    | Q(
+                        actions__target_type=CompanyCommitAction.TargetType.CORPORATION,
+                        actions__target_id=c_id,
+                    )
+                )
+                .distinct()
+                .order_by("-created_at")
+            )
