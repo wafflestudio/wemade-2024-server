@@ -708,9 +708,9 @@ class CompanyCommitCompareListView(ListAPIView):
     permission_classes = [Or(IsMasterHRTeam, IsHRTeam)]
 
     def get_queryset(self):
-        c_id = int(self.request.query_params.get("c_id"))
-        starting_commit_id = int(self.request.query_params.get("starting_commit_id"))
-        ending_commit_id = int(self.request.query_params.get("ending_commit_id"))
+        c_id = self.request.query_params.get("c_id")
+        starting_commit_id = self.request.query_params.get("starting_commit_id")
+        ending_commit_id = self.request.query_params.get("ending_commit_id")
         if not c_id:
             return CompanyCommit.objects.filter(
                 commit_id__gte=starting_commit_id,
