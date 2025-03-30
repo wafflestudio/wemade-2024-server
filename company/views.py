@@ -722,29 +722,17 @@ class CompanyCommitCompareListView(ListAPIView):
         c_id = self.request.query_params.get("c_id")
         starting_commit_id = self.request.query_params.get("starting_commit_id")
         ending_commit_id = self.request.query_params.get("ending_commit_id")
-        if not c_id:
-            return CompanyCommit.objects.filter(
-                commit_id__gte=starting_commit_id,
-                commit_id__lte=ending_commit_id,
-            ).order_by("-created_at")
-        else:
-            return (
-                CompanyCommit.objects.filter(
-                    commit_id__gte=starting_commit_id,
-                    commit_id__lte=ending_commit_id,
-                )
-                .filter(
-                    Q(
-                        actions__target_type=CompanyCommitAction.TargetType.TEAM,
-                        actions__target_id__in=Team.objects.filter(
-                            corporation_id=c_id
-                        ).values("t_id"),
-                    )
-                    | Q(
-                        actions__target_type=CompanyCommitAction.TargetType.CORPORATION,
-                        actions__target_id=c_id,
-                    )
-                )
-                .distinct()
-                .order_by("-created_at")
-            )
+
+        queryset = CompanyCommit.objects.filter(
+            commit_id__gte=starting_commit_id,
+            commit_id__lte=ending_commit_id,
+        ).order_by("-created_at")
+
+        if c_id:
+            team_ids = Team.objects.filter(corporation_id=c_id).values_list("t_id", flat=True)
+            queryset = queryset.filter(
+                Q(actions__target_type=CompanyCommitAction.TargetType.TEAM.name, actions__target_id__in=team_ids) |
+                Q(actions__target_type=CompanyCommitAction.TargetType.CORPORATION.name, actions__target_id=c_id)
+            ).distinct()
+
+        return queryset
