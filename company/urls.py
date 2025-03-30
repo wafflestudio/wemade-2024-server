@@ -37,11 +37,6 @@ urlpatterns = [
         name="team-restore",
     ),
     path("commit/list/", CompanyCommitListView.as_view(), name="commit-list"),
-    path(
-        "commit/list/<int:c_id>/",
-        CompanyCommitListView.as_view(),
-        name="commit-list-corp",
-    ),
     path("commit/latest/", CurrentCommitView.as_view(), name="commit-latest"),
     path(
         "commit/<int:commit_id>/",

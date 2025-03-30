@@ -1,6 +1,7 @@
 from copy import deepcopy
 
 from django.db.models import OuterRef, Subquery
+from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from django.db.models.aggregates import Max
 from rest_framework import status
@@ -580,6 +581,15 @@ class TeamRestoreView(RetrieveAPIView):
 
 @swagger_auto_schema(
     operation_summary="Current Commit",
+    manual_parameters=[
+        openapi.Parameter(
+            "c_id",
+            openapi.IN_QUERY,
+            description="Corporation ID",
+            type=openapi.TYPE_INTEGER,
+            required=False,
+        ),
+    ],
 )
 class CurrentCommitView(APIView):
     permission_classes = [Or(IsMasterHRTeam, IsHRTeam)]
@@ -631,6 +641,15 @@ class CompanyCommitUpdateView(RetrieveUpdateAPIView):
 
 @swagger_auto_schema(
     operation_summary="Commit List",
+    manual_parameters=[
+        openapi.Parameter(
+            "c_id",
+            openapi.IN_QUERY,
+            description="Corporation ID",
+            type=openapi.TYPE_INTEGER,
+            required=False,
+        ),
+    ],
 )
 class CompanyCommitListView(ListAPIView):
     serializer_class = CompanyCommitSerializer
@@ -660,24 +679,50 @@ class CompanyCommitListView(ListAPIView):
 
 @swagger_auto_schema(
     operation_summary="Commit compare",
+    manual_parameters=[
+        openapi.Parameter(
+            "c_id",
+            openapi.IN_QUERY,
+            description="Corporation ID",
+            type=openapi.TYPE_INTEGER,
+            required=False,
+        ),
+        openapi.Parameter(
+            "starting_commit_id",
+            openapi.IN_QUERY,
+            description="Corporation ID",
+            type=openapi.TYPE_INTEGER,
+            required=True,
+        ),
+        openapi.Parameter(
+            "ending_commit_id",
+            openapi.IN_QUERY,
+            description="Corporation ID",
+            type=openapi.TYPE_INTEGER,
+            required=True,
+        ),
+    ]
 )
 class CompanyCommitCompareListView(ListAPIView):
     serializer_class = CompanyCommitSerializer
     permission_classes = [Or(IsMasterHRTeam, IsHRTeam)]
 
     def get_queryset(self):
-        c_id = self.request.query_params.get("c_id")
-        starting_commit_id = self.request.query_params.get("starting_commit_id")
-        ending_commit_id = self.request.query_params.get("ending_commit_id")
-        commits = CompanyCommit.objects.filter(
-            commit_id__gte=starting_commit_id,
-            commit_id__lte=ending_commit_id,
-        )
+        c_id = int(self.request.query_params.get("c_id"))
+        starting_commit_id = int(self.request.query_params.get("starting_commit_id"))
+        ending_commit_id = int(self.request.query_params.get("ending_commit_id"))
         if not c_id:
-            return commits.order_by("-created_at")
+            return CompanyCommit.objects.filter(
+                commit_id__gte=starting_commit_id,
+                commit_id__lte=ending_commit_id,
+            ).order_by("-created_at")
         else:
             return (
-                commits.filter(
+                CompanyCommit.objects.filter(
+                    commit_id__gte=starting_commit_id,
+                    commit_id__lte=ending_commit_id,
+                )
+                .filter(
                     Q(
                         actions__target_type=CompanyCommitAction.TargetType.TEAM,
                         actions__target_id__in=Team.objects.filter(
