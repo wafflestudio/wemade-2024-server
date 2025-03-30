@@ -609,13 +609,13 @@ class CurrentCommitView(APIView):
             commit = (
                 CompanyCommit.objects.filter(
                     Q(
-                        actions__target_type=CompanyCommitAction.TargetType.TEAM,
+                        actions__target_type=CompanyCommitAction.TargetType.TEAM.name,
                         actions__target_id__in=Team.objects.filter(
                             corporation_id=c_id
                         ).values("t_id"),
                     )
                     | Q(
-                        actions__target_type=CompanyCommitAction.TargetType.CORPORATION,
+                        actions__target_type=CompanyCommitAction.TargetType.CORPORATION.name,
                         actions__target_id=c_id,
                     )
                 )
@@ -673,13 +673,13 @@ class CompanyCommitListView(ListAPIView):
         return (
             CompanyCommit.objects.filter(
                 Q(
-                    actions__target_type=CompanyCommitAction.TargetType.TEAM,
+                    actions__target_type=CompanyCommitAction.TargetType.TEAM.name,
                     actions__target_id__in=Team.objects.filter(
                         corporation_id=c_id
                     ).values("t_id"),
                 )
                 | Q(
-                    actions__target_type=CompanyCommitAction.TargetType.CORPORATION,
+                    actions__target_type=CompanyCommitAction.TargetType.CORPORATION.name,
                     actions__target_id=c_id,
                 )
             )
