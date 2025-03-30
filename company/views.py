@@ -701,7 +701,7 @@ class CompanyCommitListView(ListAPIView):
             type=openapi.TYPE_INTEGER,
             required=True,
         ),
-    ]
+    ],
 )
 class CompanyCommitCompareListView(ListAPIView):
     serializer_class = CompanyCommitSerializer
