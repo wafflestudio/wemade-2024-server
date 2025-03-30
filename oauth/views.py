@@ -98,7 +98,8 @@ class GoogleLoginCallback(APIView):
                 person = Person.objects.get(personal_info=personal_info)
             except Person.DoesNotExist:
                 person = Person.objects.create(
-                    personal_info=personal_info, name=personal_info.name
+                    personal_info=personal_info,
+                    name=personal_info.name,
                 )
             OauthInfo.objects.filter(email=email).delete()
             user = OauthInfo.objects.create(

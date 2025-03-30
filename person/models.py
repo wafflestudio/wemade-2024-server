@@ -3,7 +3,7 @@ from company.models import *
 
 # p_info: 공개정보(자격증 등), p_card_info(비공개/인사카드 정보)
 class PersonCardInfo(models.Model):
-    p_card_info = models.JSONField(null=True, blank=True)
+    p_card_info = models.JSONField(null=True, blank=True, default=dict)
 
     class Meta:
         db_table = "personCard_info"
@@ -17,10 +17,13 @@ class PersonalInfo(models.Model):
     emails = models.JSONField()
     birthday = models.TextField(max_length=10, null=True)  # 2000-01-01 형태
     p_info = models.JSONField(
-        null=True, blank=True
+        null=True, blank=True, default=dict
     )  # 공개 정보 : certificates 정보 있다고 생각
     p_card_info = models.OneToOneField(
-        PersonCardInfo, on_delete=models.CASCADE, null=True
+        PersonCardInfo,
+        on_delete=models.CASCADE,
+        null=True,
+        default=PersonCardInfo.objects.create,
     )  # 비공개 정보
 
     class Meta:
