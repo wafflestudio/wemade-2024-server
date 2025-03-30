@@ -398,15 +398,19 @@ class TeamDetailAPIView(RetrieveAPIView):
     permission_classes = [AllowAny]
 
 
-@swagger_auto_schema(
-    operation_summary="Team 삭제",
-)
 class TeamDeleteAPIView(RetrieveDestroyAPIView):
     serializer_class = TeamDetailSerializer
     queryset = Team.objects.all()
     lookup_field = "t_id"
     lookup_url_kwarg = "t_id"
     permission_classes = [IsMasterHRTeam]
+
+    @swagger_auto_schema(
+        operation_summary="Team 삭제",
+    )
+    def delete(self, request, *args, **kwargs):
+        super().delete(request, *args, **kwargs)
+
 
     def perform_destroy(self, instance):
         new_commit = self.request.data.get("new_commit", False)
@@ -457,9 +461,7 @@ class TeamDeleteAPIView(RetrieveDestroyAPIView):
 
 
 # ----- Role Views -----
-@swagger_auto_schema(
-    operation_summary="Role 삭제",
-)
+
 class RoleDeleteAPIView(RetrieveDestroyAPIView):
     serializer_class = RoleDetailSerializer
     queryset = Role.objects.all()
@@ -467,6 +469,12 @@ class RoleDeleteAPIView(RetrieveDestroyAPIView):
     lookup_url_kwarg = "r_id"
     permission_classes = [IsMasterHRTeam]
 
+    @swagger_auto_schema(
+        operation_summary="Role 삭제",
+    )
+    def delete(self, request, *args, **kwargs):
+        super().delete(request, *args, **kwargs)
+    
     def perform_destroy(self, instance):
         # 소프트 딜리트: is_active를 False로 변경하고, deleted_at을 기록
         if not instance.end_date:
@@ -482,16 +490,15 @@ class RoleDeleteAPIView(RetrieveDestroyAPIView):
 
 # --- Commit Views ---
 
-
-@swagger_auto_schema(
-    operation_summary="Commit Restore old status",
-)
 class CorpRestoreView(RetrieveAPIView):
     serializer_class = CorpRestoreSerializer
     queryset = Corporation.objects.all()
     lookup_field = "c_id"
     lookup_url_kwarg = "c_id"
 
+    @swagger_auto_schema(
+        operation_summary="Commit Restore old status",
+    )
     def get(self, request, commit_id, c_id):
         commit = get_object_or_404(CompanyCommit, commit_id=commit_id)
         corporation = get_object_or_404(Corporation, c_id=c_id)
@@ -531,15 +538,15 @@ class CorpRestoreView(RetrieveAPIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-@swagger_auto_schema(
-    operation_summary="Commit Restore old status",
-)
 class TeamRestoreView(RetrieveAPIView):
     serializer_class = TeamRestoreSerializer
     queryset = Team.objects.all()
     lookup_field = "t_id"
     lookup_url_kwarg = "t_id"
 
+    @swagger_auto_schema(
+        operation_summary="Commit Restore old status",
+    )
     def get(self, request, commit_id, t_id):
         commit = get_object_or_404(CompanyCommit, commit_id=commit_id)
         team = get_object_or_404(Team, t_id=t_id)
@@ -579,21 +586,21 @@ class TeamRestoreView(RetrieveAPIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-@swagger_auto_schema(
-    operation_summary="Current Commit",
-    manual_parameters=[
-        openapi.Parameter(
-            "c_id",
-            openapi.IN_QUERY,
-            description="Corporation ID",
-            type=openapi.TYPE_INTEGER,
-            required=False,
-        ),
-    ],
-)
 class CurrentCommitView(APIView):
     permission_classes = [Or(IsMasterHRTeam, IsHRTeam)]
 
+    @swagger_auto_schema(
+        operation_summary="Current Commit",
+        manual_parameters=[
+            openapi.Parameter(
+                "c_id",
+                openapi.IN_QUERY,
+                description="Corporation ID",
+                type=openapi.TYPE_INTEGER,
+                required=False,
+            ),
+        ],
+    )
     def get(self, request):
         c_id = self.request.query_params.get("c_id")
         if not c_id:
@@ -639,21 +646,25 @@ class CompanyCommitUpdateView(RetrieveUpdateAPIView):
     permission_classes = [IsMasterHRTeam]
 
 
-@swagger_auto_schema(
-    operation_summary="Commit List",
-    manual_parameters=[
-        openapi.Parameter(
-            "c_id",
-            openapi.IN_QUERY,
-            description="Corporation ID",
-            type=openapi.TYPE_INTEGER,
-            required=False,
-        ),
-    ],
-)
 class CompanyCommitListView(ListAPIView):
     serializer_class = CompanyCommitSerializer
     permission_classes = [Or(IsMasterHRTeam, IsHRTeam)]
+
+    @swagger_auto_schema(
+        operation_summary="Commit List",
+        operation_description="List of all commits",
+        manual_parameters=[
+            openapi.Parameter(
+                "c_id",
+                openapi.IN_QUERY,
+                description="Corporation ID",
+                type=openapi.TYPE_INTEGER,
+                required=False,
+            ),
+        ],
+    )
+    def get(self, request):
+        return super().get(request)
 
     def get_queryset(self):
         c_id = self.request.query_params.get("c_id")
