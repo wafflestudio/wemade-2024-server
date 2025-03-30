@@ -278,15 +278,18 @@ class CorpDetailAPIView(RetrieveAPIView):
     permission_classes = [AllowAny]
 
 
-@swagger_auto_schema(
-    operation_summary="Corporation 삭제",
-)
 class CorpDeleteAPIView(RetrieveDestroyAPIView):
     serializer_class = CorpDetailSerializer
     queryset = Corporation.objects.all()
     lookup_field = "c_id"
     lookup_url_kwarg = "c_id"
     permission_classes = [IsMasterHRTeam]
+
+    @swagger_auto_schema(
+        operation_summary="Corporation 삭제",
+    )
+    def delete(self, request, *args, **kwargs):
+        return super().delete(request, *args, **kwargs)
 
     def perform_destroy(self, instance):
         """
@@ -409,8 +412,7 @@ class TeamDeleteAPIView(RetrieveDestroyAPIView):
         operation_summary="Team 삭제",
     )
     def delete(self, request, *args, **kwargs):
-        super().delete(request, *args, **kwargs)
-
+        return super().delete(request, *args, **kwargs)
 
     def perform_destroy(self, instance):
         new_commit = self.request.data.get("new_commit", False)
@@ -462,6 +464,7 @@ class TeamDeleteAPIView(RetrieveDestroyAPIView):
 
 # ----- Role Views -----
 
+
 class RoleDeleteAPIView(RetrieveDestroyAPIView):
     serializer_class = RoleDetailSerializer
     queryset = Role.objects.all()
@@ -474,7 +477,7 @@ class RoleDeleteAPIView(RetrieveDestroyAPIView):
     )
     def delete(self, request, *args, **kwargs):
         super().delete(request, *args, **kwargs)
-    
+
     def perform_destroy(self, instance):
         # 소프트 딜리트: is_active를 False로 변경하고, deleted_at을 기록
         if not instance.end_date:
@@ -489,6 +492,7 @@ class RoleDeleteAPIView(RetrieveDestroyAPIView):
 
 
 # --- Commit Views ---
+
 
 class CorpRestoreView(RetrieveAPIView):
     serializer_class = CorpRestoreSerializer
@@ -729,10 +733,18 @@ class CompanyCommitCompareListView(ListAPIView):
         ).order_by("-created_at")
 
         if c_id:
-            team_ids = Team.objects.filter(corporation_id=c_id).values_list("t_id", flat=True)
+            team_ids = Team.objects.filter(corporation_id=c_id).values_list(
+                "t_id", flat=True
+            )
             queryset = queryset.filter(
-                Q(actions__target_type=CompanyCommitAction.TargetType.TEAM.name, actions__target_id__in=team_ids) |
-                Q(actions__target_type=CompanyCommitAction.TargetType.CORPORATION.name, actions__target_id=c_id)
+                Q(
+                    actions__target_type=CompanyCommitAction.TargetType.TEAM.name,
+                    actions__target_id__in=team_ids,
+                )
+                | Q(
+                    actions__target_type=CompanyCommitAction.TargetType.CORPORATION.name,
+                    actions__target_id=c_id,
+                )
             ).distinct()
 
         return queryset
