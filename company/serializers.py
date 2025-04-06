@@ -786,8 +786,10 @@ class CompanyCommitActionSerializer(serializers.ModelSerializer):
         fields = [
             "action",
             "target_type",
+            "old_parent_id",
             "new_parent_id",
             "target_id",
+            "old_name",
             "new_name",
             "created_at",
         ]

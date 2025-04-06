@@ -134,6 +134,9 @@ class TeamUpdateAPIView(RetrieveUpdateAPIView):
     permission_classes = [Or(IsMasterHRTeam, IsHRTeam)]
 
     def perform_update(self, serializer):
+        old_instance = self.get_object()
+        old_name = old_instance.name
+        old_parent = old_instance.parent_teams.first()
         new_commit = self.request.data.get("new_commit", False)
         if new_commit:
             commit = CompanyCommit.objects.create(created_by=self.request.user.person)
@@ -151,6 +154,7 @@ class TeamUpdateAPIView(RetrieveUpdateAPIView):
                     target_type="TEAM",
                     action="UPDATE",
                     target_id=instance.t_id,
+                    old_name=old_name,
                     new_name=instance.name,
                 )
             )
@@ -164,6 +168,7 @@ class TeamUpdateAPIView(RetrieveUpdateAPIView):
                     target_type="TEAM",
                     action="UPDATE",
                     target_id=instance.t_id,
+                    old_parent_id=old_parent.t_id if old_parent else None,
                     new_parent_id=instance.parent_teams.first().t_id
                     if instance.parent_teams.first()
                     else None,

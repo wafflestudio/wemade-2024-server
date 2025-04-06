@@ -191,8 +191,10 @@ class CompanyCommitAction(models.Model):
     target_type = models.CharField(
         max_length=50, choices=TargetType.choices, default=TargetType.TEAM
     )
+    old_parent_id = models.BigIntegerField(null=True, blank=True)
     new_parent_id = models.BigIntegerField(null=True, blank=True)
     target_id = models.BigIntegerField(null=True, blank=True)
+    old_name = models.CharField(max_length=255, null=True, blank=True)
     new_name = models.CharField(max_length=255, null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
